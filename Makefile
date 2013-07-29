@@ -21,15 +21,15 @@ GCC = g++
 all:
 	@echo "Main is: " ${MAIN}
 	rm -f main*.o
-	${GCC} -c -Wall -O3 ${CLASSES} ${MAIN}.cpp -I.
-	${GCC} -Wall -O3 -L${LIB} *.o -I. -o ${MAIN} ${LFLAGS}
+	${GCC} -Wall -O3 -c ${CLASSES} ${MAIN}.cpp -I.
+	${GCC} -Wall -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 
 link:
-	${GCC} -g0 -O3 -L${LIB} *.o -I. -o ${MAIN} ${LFLAGS}
+	${GCC} -g0 -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 
 debug:
 	${GCC} -g -ggdb -Wall ${CLASSES} ${MAIN}.cpp -I. -c
-	${GCC} -g -ggdb -Wall *.o -I. -o ${MAIN}_debug ${LFLAGS}
+	${GCC} -g -ggdb -Wall *.o -I. -o bin/${MAIN}_debug ${LFLAGS}
 	gdb ${MAIN}_debug
 
 clean:
@@ -39,9 +39,9 @@ clean:
 prof:
 	rm -f main*.o
 	${GCC} -Wall -pg -g -O3 ${CLASSES} ${MAIN}.cpp -I. -c
-	${GCC} -Wall -pg -g -O3 -L${LIB} *.o -I. -o ${MAIN}_debug ${LFLAGS}
+	${GCC} -Wall -pg -g -O3 -L${LIB} *.o -I. -o bin/${MAIN}_debug ${LFLAGS}
 
 valgrind:
 	rm -f main*.o
 	${GCC} -c -Wall -g -O1 ${CLASSES} ${MAIN}.cpp -I.
-	${GCC} -Wall -g -O1 -L${LIB} *.o -I. -o ${MAIN}_debug ${LFLAGS}
+	${GCC} -Wall -g -O1 -L${LIB} *.o -I. -o bin/${MAIN}_debug ${LFLAGS}

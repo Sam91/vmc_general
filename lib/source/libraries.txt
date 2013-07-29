@@ -7,6 +7,9 @@ The following external libraries are needed to compile this VMC code:
 mysql-cpp connector:
 http://dev.mysql.com/downloads/connector/cpp/
 
+The directory "cppconn" needs to be linked from the main directory
+
+
 lapack:
 http://www.netlib.org/lapack/
 

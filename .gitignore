@@ -1,0 +1,26 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Data output
+*.out
+
+# password files
+mysql_user.txt
+
+# External headers
+cppconn
+
+# Binaries
+#bin
+
