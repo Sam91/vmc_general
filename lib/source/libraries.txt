@@ -1,0 +1,12 @@
+The following library needs to be compiles (fortran):
+
+pfapack.tgz
+
+The following external libraries are needed to compile this VMC code:
+
+mysql-cpp connector:
+http://dev.mysql.com/downloads/connector/cpp/
+
+lapack:
+http://www.netlib.org/lapack/
+
