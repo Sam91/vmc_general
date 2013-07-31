@@ -1,14 +1,26 @@
 #include "wavefunction.h"
 #include <iomanip>
 
-wavefunction::wavefunction(int n, int l) //arguments: number of sites and linear system size
+//for the moment, we stick with 2d lattices
+wavefunction::wavefunction(int l) : wavefunction( l, 1) {}
+
+wavefunction::wavefunction(int l, int q) //arguments: linear system size and sublatice size)
 {
-  this->N = n;
-  cout << "WF: setting sites to " << n << "\n";
+  this->L = l;
+  this->Q = q;
 
-  this->L = l; this->L2 = l*l; //number of unit cells (number of sites depends on the lattice)
+  this->L2 = L*L; this->N = L2*Q;
 
-  alpha = new isingstate( L );
+  cout << "WF: setting number of sites to " << N << "\n";
+
+  if( q <= 1 ) // checking if we have non-trivial unit cell 
+    alpha = new isingstate( L );
+  else
+    alpha  = new isingstate(L, q);
+
+  //the number of operators we want to average over
+//  this->NO = Q*Q*L2; //here, we save all correlators, but average over lattice translations
+  NO = 1;
 
   f0 = new double[NO];
   for(int no=0; no<NO; no++) f0[no] = 0.;
@@ -87,6 +99,9 @@ void wavefunction::set_lattice(const string& s)
   if( s.compare("triangular")==0 )
     alpha->mylattice->set_triangular();
 
+  if( s.compare("kagome")==0 )
+    alpha->mylattice->set_kagome();
+
   //alpha->mylattice->adjacency( 0 );
 
   if( bpars->N != alpha->N ) {
@@ -98,7 +113,7 @@ void wavefunction::set_lattice(const string& s)
 void wavefunction::set_random_conf()
 {
   int *N0 = new int[NS];
-  for(int n=0; n<NS; n++) N0[n] = L2/NS;
+  for(int n=0; n<NS; n++) N0[n] = N/NS;
   alpha->set_random_conf( N0 );
   delete[] N0;
 }
@@ -166,239 +181,23 @@ void wavefunction::accumulate()
 
 #endif
 
-  //double p1, p2, p3;
-
   if( abs(wf)<SMALL ) {
     cout << "Vanishing wf in accumulate...\n";
     throw 3;
   }
 
-  //accumulate the nearest neighbor swap operator
-  for(int i1=0; i1<N; i1++ )
-  {
-    //alpha->mylattice->findn0(i1, 1);
-    //cout << "i1: " << i1 << ", ";
-    //for(int i=0; i<5; i++) cout << alpha->mylattice->neighbors[i] << "; ";
-    //cout << "\n";
+/* 
+ * Here, the measurement code that we want for this run has to be included.
+ *
+ * Don't forget to set the variable NO (number of measured oparators) accordingly (around line 20 of this file).
+ * (probably not a very good solution, but I don't have a better idea how to make the measurement both efficient and flexible)
+ *
+ */
 
-    //nearest neighbors
-/*
-     for(int n=1; n<=alpha->mylattice->links[i1][0][0]; n++)
-    {
-#if WFC
-      fj[0] += swap( i1, alpha->mylattice->links[i1][0][n], true ).real();  //swap with ratio=true(i.e., only the ratio is calculated but the wf is not updated)
-#else
-      fj[0] += swap( i1, alpha->mylattice->links[i1][0][n], true );
-#endif
-    }
-*/
-    //works for triangular lattice only
+#include "measurement_nn1.cpp"
 
-#if WFC
-      fj[0] += swap( i1, alpha->mylattice->links[i1][0][1], true ).real();
-      fj[4] += swap( i1, alpha->mylattice->links[i1][0][2], true ).real();
-      fj[0] += swap( i1, alpha->mylattice->links[i1][0][3], true ).real();
-#else
-      fj[0] += swap( i1, alpha->mylattice->links[i1][0][1], true );
-      fj[4] += swap( i1, alpha->mylattice->links[i1][0][2], true );
-      fj[0] += swap( i1, alpha->mylattice->links[i1][0][3], true );
-/*
-      p1 = swap( i1, alpha->mylattice->links[i1][0][1], true );
-      p2 = swap( i1, alpha->mylattice->links[i1][0][2], true );
-      p3 = swap( i1, alpha->mylattice->links[i1][0][3], true );
-      fj[0] += p1;
-      fj[4] += p2;
-      fj[0] += p3;
-      fj[4+3*i1+1] += p1;
-      fj[4+3*i1+2] += p2;
-      fj[4+3*i1+3] += p3;
-*/
-#endif
-
-
-    //next-nearest neighbor exchange
-    for(int n=1; n<=alpha->mylattice->links[i1][1][0]; n++)
-    {
-#if WFC
-      fj[1] += swap( i1, alpha->mylattice->links[i1][1][n], true ).real();
-#else
-      fj[1] += swap( i1, alpha->mylattice->links[i1][1][n], true );
-#endif
-    }
-
-    //third-neighbor exchange
-    for(int n=1; n<=alpha->mylattice->links[i1][2][0]; n++)
-    {
-#if WFC
-      fj[2] += swap( i1, alpha->mylattice->links[i1][2][n], true ).real();
-#else
-      fj[2] += swap( i1, alpha->mylattice->links[i1][2][n], true );
-#endif
-    }
-
-#if (NS==2) && (NO>2)
-
-    //four-site plaquette term (this measurement is optimized for TWO flavors, where a four-cycle does not arise)
-    //loop over plaquettes
-//cout << "Looping " << alpha->mylattice->plaquette4[i1][0][0] << " plaquettes.\n";
-    for(int n=1; n<=alpha->mylattice->plaquette4[i1][0][0]; n++)
-    {
-//cout << "n: " << n << "\n";
-
-      i2 = alpha->mylattice->plaquette4[i1][0][3*n-2];
-      i3 = alpha->mylattice->plaquette4[i1][0][3*n-1];
-      i4 = alpha->mylattice->plaquette4[i1][0][3*n-0];
-
-      //cout << "Plaquette: " << "(" << i1 << "," << i2 << "," << i3 << "," << i4 << ")\n";
-
-      if( (alpha->lconf[i1]==alpha->lconf[i2]) && (alpha->lconf[i2]==alpha->lconf[i3]) && (alpha->lconf[i3]==alpha->lconf[i4]) ) //(aaaa)
-      {
-        fj[3] += 1.;
-        continue;
-      }
-
-      if( (alpha->lconf[i1]!=alpha->lconf[i2]) && (alpha->lconf[i2]==alpha->lconf[i3]) && (alpha->lconf[i3]==alpha->lconf[i4]) ) //(abbb)
-      {
-//        r = swap(i1, i2, true);
-//        if(abs(r)>50.) cout << "ERROR r1a, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//        fj[2] += r.real()
-        fj[3] += swap(i1, i2, true).real();
-#else
-//        fj[2] += r;
-        fj[3] += swap(i1, i2, true);
-#endif
-        continue;
-      }
-
-      if( (alpha->lconf[i2]!=alpha->lconf[i3]) && (alpha->lconf[i3]==alpha->lconf[i4]) && (alpha->lconf[i4]==alpha->lconf[i1]) ) //(babb)
-      {
-//        r = swap(i2, i3, true);
-//        if(abs(r)>50.) cout << "ERROR r1b, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//        fj[2] += r.real()
-        fj[3] += swap(i2, i3, true).real();
-#else
-//        fj[2] += r;
-        fj[3] += swap(i2, i3, true);
-#endif
-        continue;
-      }
-
-      if( (alpha->lconf[i3]!=alpha->lconf[i4]) && (alpha->lconf[i4]==alpha->lconf[i1]) && (alpha->lconf[i1]==alpha->lconf[i2]) ) //(bbab)
-      {
-//        r = swap(i3, i4, true);
-//        if(abs(r)>50.) cout << "ERROR r1c, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//        fj[2] += r.real()
-        fj[3] += swap(i3, i4, true).real();
-#else
-//        fj[2] += r;
-        fj[3] += swap(i3, i4, true);
-#endif
-        continue;
-      }
-
-      if( (alpha->lconf[i4]!=alpha->lconf[i1]) && (alpha->lconf[i1]==alpha->lconf[i2]) && (alpha->lconf[i2]==alpha->lconf[i3]) ) //(bbba)
-      {
-//        r = swap(i4, i1, true);
-//        if(abs(r)>50.) cout << "ERROR r1d, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//        fj[2] += r.real()
-        fj[3] += swap(i4, i1, true).real();
-#else
-//        fj[2] += r;
-        fj[3] += swap(i4, i1, true);
-#endif
-        continue;
-      }
-
-      if( (alpha->lconf[i1]==alpha->lconf[i2]) && (alpha->lconf[i2]!=alpha->lconf[i3]) && (alpha->lconf[i3]==alpha->lconf[i4]) ) //(aabb)
-      {
-//        r = swap(i1, i3, true);
-//        if(abs(r)>50.) cout << "ERROR r2a, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//        fj[2] += r.real()
-        fj[3] += swap(i1, i3, true).real();
-#else
-//        fj[2] += r;
-        fj[3] += swap(i1, i3, true);
-#endif
-        continue;
-      }
-
-      if( (alpha->lconf[i2]==alpha->lconf[i3]) && (alpha->lconf[i3]!=alpha->lconf[i4]) && (alpha->lconf[i4]==alpha->lconf[i1]) ) //(abba)
-      {
-//        r = swap(i2, i4, true);
-//        if(abs(r)>50.) cout << "ERROR r2b, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//        fj[2] += r.real()
-        fj[3] += swap(i2, i4, true).real();
-#else
-//        fj[2] += r;
-        fj[3] += swap(i2, i4, true);
-#endif
-        continue;
-      }
-
-      if( (alpha->lconf[i1]!=alpha->lconf[i2]) && (alpha->lconf[i2]!=alpha->lconf[i3]) && (alpha->lconf[i3]!=alpha->lconf[i4]) ) //(abab); this is a product of two transpositions
-      {
-        backup_data();
-        int c;
-
-        r = swap(i1, i2, false); //here, we update the matrix
-//        if(abs(r)>50.) cout << "ERROR r4a, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-
-        if( abs(r)<SMALL ) //intermediate wf vanishes
-        {
-          c = alpha->lconf[i3]; alpha->lconf[i3]=alpha->lconf[i4]; alpha->lconf[i4]=c;
-          r = wf_old;
-          getwf();
-//          r = wf/r;
-//          if(abs(r)>50.) cout << "ERROR r4a, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-#if WFC
-//          fj[2] += r.real();
-          fj[3] += (wf/r).real();
-#else
-//          fj[2] += r;
-          fj[3] += wf/r;
-#endif
-          restore_data();
-          c = alpha->lconf[i1]; alpha->lconf[i1]=alpha->lconf[i2]; alpha->lconf[i2]=c;
-          c = alpha->lconf[i3]; alpha->lconf[i3]=alpha->lconf[i4]; alpha->lconf[i4]=c;
-          continue;
-        }
-
-        r *= swap(i3, i4, false); //here, we update the matrix
-//        if(abs(r)>50.) cout << "ERROR r4b, " << n << ", (" << i1 << "," << i2 << "," << i3 << "," << i4 << "): " << r << "\n";
-
-#if WFC
-        fj[3] += r.real();
-#else          
-        fj[3] += r;
-#endif    
-        restore_data();
-        c = alpha->lconf[i1]; alpha->lconf[i1]=alpha->lconf[i2]; alpha->lconf[i2]=c;
-        c = alpha->lconf[i3]; alpha->lconf[i3]=alpha->lconf[i4]; alpha->lconf[i4]=c;
-      }
-    } //plaquette loop
-#endif //NS==2
-
-  } //end of loop over sites
-
-  for(int no=0; no<NO; no++) {//operator index
-    f0[no] += fj[no];
-
-#if NP //gradient calculation for each operator
-    for(int p=0; p<NP; p++) f0d[no][p] += fj[no]*dwf[p]; //parameter index
-#endif
-  }
+  for(int no=0; no<NO; no++) f0[no] += fj[no];
 }
-
-/*void wavefunction::setf(void* ff)
-{
-  f = (double**)ff;
-}*/
 
 void wavefunction::initiate_f( int n )
 {
@@ -423,11 +222,11 @@ void wavefunction::collect_data()
 {
   for(int no=0; no<NO; no++)
   {
-    f[run][no] = f0[no]/((double)(L2*mc_length));
+    f[run][no] = f0[no]/((double)(mc_length*L2));
     f0[no] = 0.;
 #if NP
     for(int p=0; p<NP; p++) {
-      fd[run][no][p] = f0d[no][p]/((double)(L2*mc_length)) - f0d[NO][p]/((double)(mc_length));
+      fd[run][no][p] = f0d[no][p]/((double)(N*mc_length)) - f0d[NO][p]/((double)(mc_length));
       f0d[no][p] = 0.;
     }
     for(int p=0; p<NO; p++) f0d[NO][p] = 0.;
@@ -496,19 +295,26 @@ void wavefunction::calculate_statistics()
   }
   run = 0;
 
+  print_avgs();
+}
+
+void wavefunction::print_avgs()
+{
+  cout<< "ff={";
+  for(int no=0; no<NO-1; no++) {
+    cout << std::fixed << setprecision(4) << average[no] << " pm " << sigma[no] << "\n";
+  }
+  cout << std::fixed << setprecision(4) << average[NO-1] << "};"<<endl;
+  cout<< "ffsigma={";
   for(int no=0; no<NO; no++) {
     cout << std::fixed << setprecision(4) << average[no] << " pm " << sigma[no] << "\n";
-#if NP
-    for(int p=0; p<NP; p++)
-      cout << std::fixed << setprecision(4) << daverage[no][p] << " pm " << dsigma[no][p] << "\n";
-#endif
   }
-  cout << "\n";
+  cout << std::fixed << setprecision(4) << sigma[NO-1] << "};"<<endl;
 }
 
 /*
  * This basic implementation of the MC step function performs a simple exchange of flavors (swap).
- * It should be overwritten when flavor non-conserving moves should be performed (crop).
+ * It should be overwritten when flavor non-conserving moves need to be performed (crop).
 */
 bool wavefunction::step()
 {

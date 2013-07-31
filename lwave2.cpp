@@ -1,7 +1,8 @@
 #include "lwave2.h"
 
+lwave2::lwave2(int l) : lwave2(l, 1) {}
 
-lwave2::lwave2(int n, int l) : paired2k( n, l )
+lwave2::lwave2(int l, int q) : paired2k( l, q )
 {
   pars = new parameters;
   bpars = pars;

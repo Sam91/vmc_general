@@ -1,7 +1,8 @@
 #include "amperean.h"
 
+amperean::amperean(int l) : amperean( l, 1 ) {}
 
-amperean::amperean(int n, int l) : paired2k( n, l )
+amperean::amperean(int l, int q) : paired2k( l, q )
 {
   pars = new parameters;
   bpars = pars;

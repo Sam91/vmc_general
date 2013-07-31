@@ -10,6 +10,12 @@ isingstate::isingstate(int sys)
   init(sys);
 }
 
+isingstate::isingstate(int sys, int ucell)
+{
+  init(sys, ucell);
+}
+
+
 isingstate::isingstate()
 {
   init(4);
@@ -18,28 +24,41 @@ isingstate::isingstate()
 isingstate::~isingstate()
 {
   cout << "Destroying Ising state\n";
-  destroy(conf, L);
+
   delete[] Na;
   delete[] lconf;
   delete mylattice;
 }
 
-void isingstate::init( int sys )
+void isingstate::init( int l )
 {
-  cout << "Creating new Ising state with NS=" << NS << " and L=" << sys << "\n";
+  this->N = l*l;
 
-  //this->na = na; 
-  this->L = sys;
-  this->N = L*L;
+  cout << "Creating new Ising state with NS=" << NS << " and N=" << N << "\n";
 
-  conf = createint(L);
   lconf = new int[N];
   Na = new int[NS];
 
-  mylattice = new lattice(sys, 0);
+  mylattice = new lattice(l, 1);
 
   randomize();
 }
+
+//version which allows for unit call
+void isingstate::init( int l, int q )
+{
+  this->N = l*l*q;
+
+  cout << "Creating new Ising state with NS=" << NS << " and N=" << N << "\n";
+
+  lconf = new int[N];
+  Na = new int[NS];
+
+  mylattice = new lattice(l, q);
+
+  randomize();
+}
+
 
 int isingstate::save(const std::string s) //save the configuration to a file
 {
@@ -57,11 +76,8 @@ void isingstate::print()
   for(int n=0; n<NS; n++) cout << Na[n] << ", ";
   cout << "\n";
   cout << "conf:\n";
-  for(int i=0; i<L; i++) {
-    for(int j=0; j<L; j++) {
-      cout << lconf[i+L*j] << ", ";
-    }
-    cout << "\n";
+  for(int i=0; i<N; i++) {
+      cout << lconf[i] << ", ";
   }
   cout << "\n";
 }
@@ -72,8 +88,7 @@ bool isingstate::checkNa()
   for(int i=0; i<NS; i++) Natest[i] = 0;
 
   for(int i=0; i<N; i++)
-    //for(int j=0; j<L; j++)
-      Natest[ lconf[i] ]++;
+    Natest[ lconf[i] ]++;
 
   for(int i=0; i<NS; i++)
     if( Natest[i]!=Na[i] ) {
@@ -110,8 +125,7 @@ void isingstate::set_random_conf(int *Na0)
   //double *Nap = new double[na];
   int Nr, Nat;
 
-  for(int i=0; i<L; i++) {
-    for(int j=0; j<L; j++) {
+  for(int i=0; i<N; i++) {
       //for(int k=0; k<na; k++)
       //  Nap[k] = (double)Na0[k]/(double)N0;
 
@@ -125,13 +139,10 @@ void isingstate::set_random_conf(int *Na0)
         Nat += ourNa[k];
 
         if( Nr<Nat ) { //found a configuration
-          conf[i][j] = k;
-          lconf[i+L*j] = k;
+          lconf[i] = k;
           ourNa[k]--; N0--;
           break;
         }
-      }
-    
     }
   }
   delete[] ourNa;

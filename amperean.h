@@ -23,6 +23,7 @@ class amperean : public paired2k
 {
 public:
   amperean(int, int);
+  amperean(int);
   ~amperean();
 
   virtual void create_dd(); //sets delta, xi, mu, ap in paired2k

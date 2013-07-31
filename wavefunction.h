@@ -10,10 +10,9 @@
 #define JASTROW 0
 
 //number of real observables
-//#define NO 5
-#define NO 5
+//#define NO 5 //this is now set in wavefunction.cpp (bcs we want to make it depend on system size)
 
-//number of variational parameters for which we would like to calculate the gradient
+//number of variational parameters for which we would like to calculate the gradient (not implemented)
 #define NP 0
 
 #define SMALL 1e-10
@@ -31,6 +30,7 @@ class wavefunction
 
 public:
   wavefunction(int, int);
+  wavefunction(int);
   virtual ~wavefunction();
 
   virtual void getwf() =0; //calculate <alpha|wf> from scratch
@@ -51,6 +51,7 @@ public:
 
   virtual void print() =0;
   virtual int insert_db() =0;
+  virtual void print_avgs();
 
   int getL();
   void print_alpha();
@@ -100,7 +101,9 @@ public:
 protected:
   isingstate* alpha;
 
-  int L, L2, N; //system size
+  int L, Q, L2, N; //system size
+
+  int NO; //number of operator to calculate
 
   bool accept( complex<double> );
   bool accept( double );
@@ -128,6 +131,7 @@ protected:
 
   int* NF; //Flavor number, if this wf is chosen to be such an eigenstate
   double cff;
+
 
 private:
   double **f, ***fd;

@@ -22,6 +22,7 @@ class lwave2 : public paired2k
 {
 public:
   lwave2(int, int);
+  lwave2(int);
   ~lwave2();
 
   virtual void create_dd(); //sets delta, xi, mu, ap in paired2k

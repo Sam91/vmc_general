@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
   
-  lwave2* wf = new lwave2( L*L, L );
-  //amperean* wf = new amperean( L*L, L );
+  lwave2* wf = new lwave2( L );
+  //amperean* wf = new amperean( L );
 
   //double* dl = new double[4];
   //dl[4] = 22.;
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
   myvmc->calculate_statistics();
 
-  wf->insert_db();
+//  wf->insert_db();
 
   delete myvmc;
   delete wf;

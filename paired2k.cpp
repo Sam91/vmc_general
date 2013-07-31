@@ -1,6 +1,6 @@
 #include "paired2k.h"
 
-paired2k::paired2k(int n, int l) : twoflavor( n, l )
+paired2k::paired2k(int l, int q) : twoflavor( l, q )
 {
   //hopping amplitude (k-space, translational symmetry preserved)
   xi = new double[N];

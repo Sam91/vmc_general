@@ -25,8 +25,9 @@ class isingstate
 {
 
 public:
-  //number of states per site and linear system size of LxL square lattice (later, we may add unit cells)
-  isingstate(int syssize);
+  //Linear system size L for LxL square lattice
+  isingstate(int L); //trivial unit cell
+  isingstate(int L, int ucell); // non-trivial unit cell
   isingstate();
 
   ~isingstate();
@@ -47,15 +48,14 @@ public:
   //flavor number per site
 //  int na;
 
-  //linear system size and system size
-  int L, N; //N is the number of sites
+  int N; //N is the number of sites
 
-  int** conf;
   int* Na;
 
   lattice* mylattice;
 
   void init(int);
+  void init(int, int);// version for the case of non-trivial unit cell size
   int save(const std::string);
   int load(const std::string);
 };

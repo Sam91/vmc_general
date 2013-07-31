@@ -21,6 +21,9 @@ mysql_user.txt
 # External headers
 cppconn
 
-# Binaries
-#bin
+# mist
+ss
+
+# compressed files
+*.tar
 

@@ -3,34 +3,34 @@
 
 lattice::lattice(int L0, int Q0)
 {
-  this->L = L0; this->Q = Q0; this->L2 = L0*L0;
-  //nx = ny = q = 0;
-  neighbors = new int[L2];
+  this->L = L0; this->Q = Q0;
+  L2 = L*L; N = L2*Q;
 
-  nbr=3;
+  cout << "Creating lattice with L=" << L << " and " << "Q=" << Q << "." << endl;
+
+  //number of neighbors we want to store in the links/connectivity matrices
+  nbr=1;
 
   /* The site relations are defined in the following way
    * plaquette[site index j1][type of plaquette][number of plaquettes on this site, j2, j3, j4, ...]
   */
 
-  connectivity = new (int(**[this->L2])); //lets take first and second neighbor
-  links = new (int(**[this->L2]));
-  plaquette4 = new (int(**[this->L2])); //four-site plaquettes
+  connectivity = new (int(**[ this->N ])); //lets take first and second neighbor
+  links = new (int(**[ this->N ]));
+  plaquette4 = new (int(**[ this->N ])); //four-site plaquettes
 
-  for(int i=0; i<L2; i++)
+  for(int i=0; i<N; i++)
   {
-    connectivity[i] = createint(nbr,10);
-    links[i] = createint(nbr,10);
-    plaquette4[i] = createint(nbr,20);
+    connectivity[i] = createint(nbr, 10);
+    links[i] = createint(nbr, 10);
+    plaquette4[i] = createint(nbr, 20);
   }
 
 }
 
 lattice::~lattice()
 {
-  delete[] neighbors;
-
-  for(int i=0; i<L2; i++)
+  for(int i=0; i<N; i++)
   {
     destroy(connectivity[i], nbr);
     destroy(links[i], nbr);
@@ -41,10 +41,11 @@ lattice::~lattice()
   delete[] plaquette4;
 }
 
+// mapping from cartesian coordinates to linear coordinates
 int lattice::j(int n0, int m0, int q0)
 {
 #ifdef SUBL
-    return n0 + m0*L + q0*L2;
+    return Q*(n0 + m0*L) + q0;
 #else
     return n0 + m0*L;
 #endif
@@ -52,6 +53,7 @@ int lattice::j(int n0, int m0, int q0)
 
 std::string lattice::get_desc() {return desc;}
 
+// inverse mapping from linear to cartesian coordinates
 void lattice::getnq(int &nx, int &ny, int &q, int jj)
 {
   //cout << "L=" << L << endl;
@@ -62,8 +64,8 @@ void lattice::getnq(int &nx, int &ny, int &q, int jj)
     exit(-1);
   }
 #if SUBL
-  q = jj % L2;
-  int j0 = jj - L2*q;
+  q = jj % Q;
+  int j0 = jj / Q;
   nx = j0 % L;
   ny = j0 / L;
 #else
@@ -78,7 +80,7 @@ void lattice::getnq(int &nx, int &ny, int &q, int jj)
 }
 
 //restrain the values to the LxL using periodc boundary conditions
-void lattice::torus( int &nx, int &ny)
+void lattice::torus(int &nx, int &ny)
 {
   if(nx<0 ) nx += L;
   if(nx>=L) nx -= L;
@@ -86,17 +88,94 @@ void lattice::torus( int &nx, int &ny)
   if(ny<0 ) ny += L;
   if(ny>=L) ny -= L;
 }
-/*
-void lattice::torus()
-{
-  if(nx<0) nx += L;
-  nx = (nx%L);
-  if(ny<0) ny += L;
-  ny = (ny%L);
-}*/
 
-//sets the connectivity and links matrices to a triangular one (currently only next neighbor!)
-//triangular lattice on a torus
+//sets the connectivity and links matrices to a kagome (currently only nearest neighbor!)
+void lattice::set_kagome()
+{
+  int n;
+  int nx2, ny2, q2, i2;
+  int i1;
+
+  //checking for consistency
+  desc = "kagome";
+  cout << "Setting lattice to " << desc << ".\n";
+
+  if( Q!=3 )
+  {
+    cout << "lattice::set_kagome():: cannot set kagome; number of sites in the unit cell Q is different from 3 "<<endl;
+    exit(-1);
+  }
+
+  //loop over all UNIT CELLS of the lattice
+  //We take the three sites of UP TRIANGLES as unit cell
+  for(int nx=0; nx<L; nx++) // x-coordinate
+  {
+    for(int ny=0; ny<L; ny++) // y-coordinate
+    {
+      for(int q=0; q<Q; q++) // loop over positions in this unit cell
+      {
+        // get the linear index of the current site 
+        i1 = j(nx, ny, q);
+
+        //setting nearest neighbors: links =  distinct links in the direction 0, 60 and 120 degree; connectivity = all links
+        n = 0;
+        //cout<< "site coord="<<nx<<" "<<ny<<" "<<q<<"; i1 =  "<<i1<<endl;
+        links[i1][n][0] = 2;//number of nn for a given site
+        connectivity[i1][n][0] = 4;
+
+        if( q==0 ) // first site in the unit cell
+        {
+          // +x
+          nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // +y
+          nx2 = nx; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x
+          nx2 = nx-1; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -y
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
+        }  
+
+        if( q==1 ) // second site in the unit cell
+        {
+          // +x 
+          nx2 = nx+1; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -x+y
+          nx2 = nx; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x
+          nx2 = nx; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // +x-y
+          nx2 = nx+1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
+        }
+
+        if( q==2 ) // third site in the unit cell
+        {
+          // +y
+          nx2 = nx; ny2 = ny+1; q2 =  0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -x+y
+          nx2 = nx-1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // +y
+          nx2 = nx; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // +x-y
+          nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
+        }
+      }
+    }
+  }
+}
+
+//sets the connectivity and links matrices to a triangular lattice (currently up to third neighbor, and four-site plaquette term)
 void lattice::set_triangular()
 {
   int n;
@@ -347,102 +426,7 @@ void lattice::set_checkerboard()
   }
 }
 
-//finds all n-th neighbors to site i1 and writes them to table "neighbors".
-//Here, the connectivity of the lattice is defined
-void lattice::findn(int i1, int n)
-{
-  switch( n )
-  {
-    case 1:
-      neighbors[0] = 4;
-
-      //x-direction
-      if( i1%L == L-1 ) neighbors[1] = i1-L+1;
-      else neighbors[1] = i1+1;
-
-      if( i1%L == 0 ) neighbors[2] = i1+L-1;
-      else neighbors[2] = i1-1;
-
-      //y-direction
-      if( i1>=L2-L ) neighbors[3] = i1-L2+L;
-      else neighbors[3] = i1+L;
-
-      if( i1<L ) neighbors[4] = i1+L2-L;
-      else neighbors[4] = i1-L;
-
-      break;
-    case 2:
-      neighbors[0] = 4;
-
-      //xy-next nearest
-      if( i1==L2-1 ) neighbors[1] = 0;
-      else if( i1>=L2-L ) neighbors[1] = i1-L2+L+1;
-      else if( i1%L==L-1 ) neighbors[1] = i1+1;
-      else neighbors[1] = i1+L+1;
-
-      if( i1==0 ) neighbors[2] = L2-1;
-      else if( i1<=L ) neighbors[2] = i1+L2-L-1;
-      else if( i1%L==0 ) neighbors[2] = i1-1;
-      else neighbors[2] = i1-L-1;
-
-      //-xy-next nearest
-      if( i1==L2-L ) neighbors[3] = L-1;
-      else if( i1>L2-L ) neighbors[3] = i1-L2+L-1;
-      else if( i1%L == 0 ) neighbors[3] = i1+2*L-1;
-      else neighbors[3] = i1+L-1;
-
-      if( i1==L-1 ) neighbors[4] = L2-L;
-      else if( i1<L ) neighbors[4] = i1+L2-L+1;
-      else if( i1%L == L-1 ) neighbors[4] = i1-2*L+1;
-      else neighbors[4] = i1-L+1;
-
-      break;
-    default:
-      neighbors[0] = 0;
-      //std::cout << "Error\n";
-  }
-}
-
-void lattice::findn0(int i1, int n)
-{
-  switch( n )
-  {
-    case 1:
-      neighbors[0] = 2;
-
-      //x-direction
-      if( i1%L == L-1 ) neighbors[1] = i1-L+1;
-      else neighbors[1] = i1+1;
-
-      //y-direction
-      if( i1>=L2-L ) neighbors[2] = i1-L2+L;
-      else neighbors[2] = i1+L;
-
-      break;
-
-    case 2:
-      neighbors[0] = 2;
-
-      //xy-next nearest
-      if( i1==L2-1 ) neighbors[1] = 0;
-      else if( i1>=L2-L ) neighbors[1] = i1-L2+L+1;
-      else if( i1%L==L-1 ) neighbors[1] = i1+1;
-      else neighbors[1] = i1+L+1;
-
-      //-xy-next nearest
-      if( i1==L2-L ) neighbors[2] = L-1;
-      else if( i1>L2-L ) neighbors[2] = i1-L2+L-1;
-      else if( i1%L == 0 ) neighbors[2] = i1+2*L-1;
-      else neighbors[2] = i1+L-1;
-
-      break;
-
-    default:
-      neighbors[0] = 0;
-      //std::cout << "Error\n";
-  }
-}
-
+/*
 void lattice::adjacency(int n)
 {
   int **m = createint(L2);
@@ -462,11 +446,19 @@ void lattice::adjacency(int n)
 
   destroy(m, L2);
 }
+*/
 
 void lattice::print() //write out link and connectivity matrices
 {
+
+#ifdef SUBL
+  int Qtmp = Q;
+#else
+  int Qtmp = 1;
+#endif
+
   cout << "links:\n";
-  for(int i=0; i<L2; i++)
+  for(int i=0; i<Qtmp*L2; i++)
   {
     cout << "i1: " << i;
     for(int n=0; n<nbr; n++) {
@@ -477,7 +469,7 @@ void lattice::print() //write out link and connectivity matrices
     cout << "\n";
   }
   cout << "\nconnectivity:\n";
-  for(int i=0; i<L2; i++)
+  for(int i=0; i<Qtmp*L2; i++)
   {
     cout << "i1: " << i;
     for(int n=0; n<nbr; n++) {
@@ -488,3 +480,4 @@ void lattice::print() //write out link and connectivity matrices
     cout << "\n";
   }
 }
+

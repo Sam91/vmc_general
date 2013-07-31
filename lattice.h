@@ -3,7 +3,7 @@
 #ifndef LATTICE_H
 #define LATTICE_H
 
-#define SUBL 0
+#define SUBL 1
 
 #include <string>
 
@@ -11,7 +11,7 @@ class lattice
 {
 
 public:
-  lattice(int L, int Q);
+  lattice(int l, int q);
   ~lattice();
 
   int j(int n, int m, int q);  //get the linear lattice position
@@ -22,9 +22,9 @@ public:
 
 //  int nx, ny, q; //coordinates uniquely labelling a point in the lattice
   
-  int* neighbors;
-  void findn (int, int);
-  void findn0(int, int);
+//  int* neighbors;
+//  void findn (int, int);
+//  void findn0(int, int);
 
   int*** connectivity; //connectivity matrix of the lattice (all links from a given site)
   int*** links; //half of the links from a given site such that no double counting occurs
@@ -38,13 +38,14 @@ public:
   void set_square();
   void set_triangular();
   void set_checkerboard();
+  void set_kagome();
 
   void adjacency(int);
   std::string get_desc();
 
 private:
   int L, Q;
-  int L2;
+  int L2, N;
 
   int nbr; //number of neighbors stored in the connectivity matrix
 
