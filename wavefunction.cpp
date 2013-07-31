@@ -20,7 +20,7 @@ wavefunction::wavefunction(int l, int q) //arguments: linear system size and sub
 
   //the number of operators we want to average over
 //  this->NO = Q*Q*L2; //here, we save all correlators, but average over lattice translations
-  NO = 1;
+  NO = 4;
 
   f0 = new double[NO];
   for(int no=0; no<NO; no++) f0[no] = 0.;
@@ -194,7 +194,7 @@ void wavefunction::accumulate()
  *
  */
 
-#include "measurement_nn1.cpp"
+#include "measurement_nnn.cpp"
 
   for(int no=0; no<NO; no++) f0[no] += fj[no];
 }

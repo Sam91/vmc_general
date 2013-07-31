@@ -9,7 +9,7 @@ lattice::lattice(int L0, int Q0)
   cout << "Creating lattice with L=" << L << " and " << "Q=" << Q << "." << endl;
 
   //number of neighbors we want to store in the links/connectivity matrices
-  nbr=1;
+  nbr=10;
 
   /* The site relations are defined in the following way
    * plaquette[site index j1][type of plaquette][number of plaquettes on this site, j2, j3, j4, ...]
@@ -119,8 +119,7 @@ void lattice::set_kagome()
 
         //setting nearest neighbors: links =  distinct links in the direction 0, 60 and 120 degree; connectivity = all links
         n = 0;
-        //cout<< "site coord="<<nx<<" "<<ny<<" "<<q<<"; i1 =  "<<i1<<endl;
-        links[i1][n][0] = 2;//number of nn for a given site
+        links[i1][n][0] = 2; //number of nn for a given site
         connectivity[i1][n][0] = 4;
 
         if( q==0 ) // first site in the unit cell
@@ -158,7 +157,7 @@ void lattice::set_kagome()
         if( q==2 ) // third site in the unit cell
         {
           // +y
-          nx2 = nx; ny2 = ny+1; q2 =  0; torus(nx2, ny2);
+          nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
           // -x+y
           nx2 = nx-1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
@@ -170,9 +169,152 @@ void lattice::set_kagome()
           nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
         }
-      }
-    }
-  }
+
+        // second neighbors
+        n = 1;
+        links[i1][n][0] = 2;//number of 2nd for a given site
+        connectivity[i1][n][0] = 4;
+
+        if( q==0 ) // first site in the unit cell
+        {
+          // +y,1
+          nx2 = nx; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -y,2
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x-y,1
+          nx2 = nx-1; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -x,2
+          nx2 = nx-1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+        }
+
+        if( q==1 ) // second site in the unit cell
+        {
+          // +x,2
+          nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // +x+y,0
+          nx2 = nx+1; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x-y,2
+          nx2 = nx-1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -y,0
+          nx2 = nx; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+        }
+
+        if( q==2 ) // third site in the unit cell
+        {
+          // +x,0
+          nx2 = nx+1; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // +x+y,1
+          nx2 = nx+1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -y,0
+          nx2 = nx; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -x,1
+          nx2 = nx-1; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+        }
+
+
+        // third neighbors
+        n = 2;
+        links[i1][n][0] = 2;//number of 2nd for a given site
+        connectivity[i1][n][0] = 4;
+
+        if( q==0 ) // first site in the unit cell
+        {
+          // +x,0
+          nx2 = nx+1; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // +x+y,0
+          nx2 = nx+1; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x,0
+          nx2 = nx-1; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -x-y,0
+          nx2 = nx-1; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+        }
+
+        if( q==1 ) // second site in the unit cell
+        {
+          // +x,1
+          nx2 = nx+1; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // +y,1
+          nx2 = nx; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x,1
+          nx2 = nx-1; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -y,1
+          nx2 = nx; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+        }
+
+        if( q==2 ) // third site in the unit cell
+        {
+          // +x+y,2
+          nx2 = nx+1; ny2 = ny+1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // +y,2
+          nx2 = nx; ny2 = ny+1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x-y,2
+          nx2 = nx-1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // -y,2
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+        }
+
+        // diagonal neighbors (hexagon)
+        n = 3;
+        links[i1][n][0] = 1;//number of 2nd for a given site
+        connectivity[i1][n][0] = 2;
+
+        if( q==0 ) // first site in the unit cell
+        {
+          // +y,0
+          nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -y,0
+          nx2 = nx; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+        }
+
+        if( q==1 ) // second site in the unit cell
+        {
+          // +x+y,1
+          nx2 = nx+1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -x-y,1
+          nx2 = nx-1; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+        }
+
+        if( q==2 ) // third site in the unit cell
+        {
+          // +x,2
+          nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -x,2
+          nx2 = nx-1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+        }
+
+      } //loop over sites in unit cell
+    } //loop over sites (x)
+  } //loop over sites (y)
 }
 
 //sets the connectivity and links matrices to a triangular lattice (currently up to third neighbor, and four-site plaquette term)
