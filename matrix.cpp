@@ -7,16 +7,17 @@
 /* This source implements all matrix related methods of matrix.h */
 
 #include "matrix.h"
-#include <vector>
 #include "helperfunctions.h"
+
+#include <vector>
 #include <iomanip>
 #include <stdio.h>
 #include <cstring>
 
 //Wimmer's Pfaffian package
+#if PFA
 #include "pfapack.h"
-
-//using namespace std;
+#endif
 
 /* Calculates the inverse of a and returns the det. Destroys the matrix a. The inv is written to y */
 double inverse_m(double **a, double **y, int n)
@@ -75,6 +76,7 @@ complex<double> inverse_m(complex<double> **a, complex<double> **y, int n)
 }
 
 /* Calculates the inverse of a skew symmetric matrix a and returns the Pfaffian. a is destroyed and y returns the inv*/
+#if PFA
 double inverse_mpfa(double **a, double **y, int n)
 {
   int i,j,info=0, LWORK;
@@ -209,6 +211,7 @@ complex<double> inverse_mpfa(complex<double> **a, complex<double> **y, int n)
 
   return pfa;
 }
+#endif
 
 int ludcmp(double **a, int n, int *indx, double *d)
 {
@@ -610,6 +613,7 @@ complex<double> update_column( complex<double> *column, int column_number, compl
 }
 
 /* Updates one row and column of the inverse of a skew symmetric matrix */
+#if PFA
 double update_pfa( double *column, int col_number, double **inv, int n)
 {
   int i,j;
@@ -783,7 +787,7 @@ complex<double> update_pfa( complex<double> *column, int col_number, complex<dou
   //return r here; it is the ratio of the pfaffians
   return r;
 }
-
+#endif
 
 double det_ratio_row( double *row, int row_number, double *inv, int n)
 {

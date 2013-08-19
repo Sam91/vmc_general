@@ -140,8 +140,9 @@ void twoflavor::getwf()
   //return wf;
 }
 
-//swap operator of two sites i1 and i2 (corresponding to virtual_replacement)
+//swap operator of two sites i1 and i2 (corresponding to virtual_replacement previously)
 //returns the ratio wf_after/wf_before
+//if ratio=True, only the ratio is returned; it ratio=False, the wave function is also updated (MC step)
 #if WFC
 complex<double> twoflavor::swap(int i1, int i2, bool ratio)
 {
