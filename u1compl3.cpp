@@ -2,7 +2,8 @@
 #include "spinone.h"
 #include <iomanip>
 
-//define a hybridized unpaired fermionic state on a general lattice for NS flavors.
+// Define an unpaired real fermionic state on the Kagome lattice with first, second, and diagonal neighbor hopping
+// The state may have unit-cell doubling (epsilon) and an additional rotation staggering of the hopping; (taur, taui)
 
 u1dirac::u1dirac(int l, int q) : u1hybrid( l, q )
 {
@@ -84,7 +85,6 @@ void u1dirac::set_hopping3(double *tt1, double *tt2)
 
 void u1dirac::print() {}
 
-/*
 void u1dirac::print_avgs()
 {
   cout<< "ff={";
@@ -98,7 +98,7 @@ void u1dirac::print_avgs()
   }
   cout << std::fixed << setprecision(4) << sigma[NO-1] << "};"<<endl;
 }
-*/
+
 
 int u1dirac::insert_db()
 {

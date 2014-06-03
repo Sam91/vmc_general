@@ -4,7 +4,7 @@
  * Implements measurement of first, second, and third neighbor correlator (first used for triangular lattice states)
  * Note that we are averaging over lattice translations here, so wavefunction::average() needs to divide by L2
  *
- * For this measurement, we need NO = 4
+ * For this measurement, we need NO = 3
  */
 
 
@@ -12,7 +12,7 @@
   {
 
     //nearest neighbors
-     for(int n=1; n<=alpha->mylattice->links[i1][0][0]; n++)
+    for(int n=1; n<=alpha->mylattice->links[i1][0][0]; n++)
     {
 #if WFC
       fj[0] += swap( i1, alpha->mylattice->links[i1][0][n], true ).real();  //swap with ratio=true(i.e., only the ratio is calculated but the wf is not updated)
@@ -41,6 +41,7 @@
 #endif
     }
 
+/*
     //fourth-neighbor
     for(int n=1; n<=alpha->mylattice->links[i1][3][0]; n++)
     {
@@ -50,6 +51,7 @@
       fj[3] += swap( i1, alpha->mylattice->links[i1][3][n], true );
 #endif
     }
+*/
 
   } // end loop over all sites
 

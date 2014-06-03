@@ -106,8 +106,8 @@ void lattice::set_kagome()
     exit(-1);
   }
 
-  //loop over all UNIT CELLS of the lattice
-  //We take the three sites of UP TRIANGLES as unit cell
+  //loop over all UNIT CELLS of the lattice (cell: three sites of the hexagon)
+  
   for(int nx=0; nx<L; nx++) // x-coordinate
   {
     for(int ny=0; ny<L; ny++) // y-coordinate
@@ -123,7 +123,23 @@ void lattice::set_kagome()
         connectivity[i1][n][0] = 4;
 
         if( q==0 ) // first site in the unit cell
-        {
+        { //ordering: straight lignes, then one rotation to the right
+          // +y
+          nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+
+          // -y
+          nx2 = nx; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+
+          // +x+y
+          nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          
+          // -x-y
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+/*
           // +x
           nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
@@ -136,10 +152,28 @@ void lattice::set_kagome()
           // -y
           nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
+*/
         }  
 
         if( q==1 ) // second site in the unit cell
         {
+          // -x
+          nx2 = nx; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+
+          // +x
+          nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+
+          // +y
+          nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+
+          // -y
+          nx2 = nx; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+
+/*
           // +x 
           nx2 = nx+1; ny2 = ny; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
@@ -152,22 +186,41 @@ void lattice::set_kagome()
           // +x-y
           nx2 = nx+1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
+*/
         }
 
         if( q==2 ) // third site in the unit cell
         {
+          // -x-y
+          nx2 = nx-1; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+
+          // +x+y
+          nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+
+          // -x
+          nx2 = nx-1; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+
+          // +x
+          nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+
+/*
           // +y
           nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
           // -x+y
           nx2 = nx-1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
-          // +y
+          // -y
           nx2 = nx; ny2 = ny; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
           // +x-y
           nx2 = nx; ny2 = ny; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;  
+*/
         }
 
         // second neighbors
@@ -176,57 +229,111 @@ void lattice::set_kagome()
         connectivity[i1][n][0] = 4;
 
         if( q==0 ) // first site in the unit cell
-        {
-          // +y,1
-          nx2 = nx; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+        { //ordering: straight lines, then one rotation to the left
+
+          // -x+y
+          nx2 = nx; ny2 = ny; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
-          // -y,2
-          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+
+          // +x-y
+          nx2 = nx+1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
-          // -x-y,1
+
+          // -2x-y
           nx2 = nx-1; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
-          // -x,2
-          nx2 = nx-1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+
+          // +2x+y
+          nx2 = nx+1; ny2 = ny; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+
+/*
+          // 2x - y
+          nx2 = nx+1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -x + 2y
+          nx2 = nx-1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -2x + y
+          nx2 = nx-1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // x - 2y
+          nx2 = nx; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+*/
         }
 
         if( q==1 ) // second site in the unit cell
         {
-          // +x,2
-          nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          // -2x-y
+          nx2 = nx-1; ny2 = ny; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
-          // +x+y,0
+
+          // +2x+y
           nx2 = nx+1; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
-          // -x-y,2
-          nx2 = nx-1; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+
+          // -x-2y
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
-          // -y,0
-          nx2 = nx; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+
+          // +x+2y
+          nx2 = nx+1; ny2 = ny+1; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+
+/*
+          // x + y
+          nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -x + 2y
+          nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+          // -x - y
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+          // x - 2y
+          nx2 = nx+1; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+*/
         }
 
         if( q==2 ) // third site in the unit cell
         {
-          // +x,0
+          // -x-2y
+          nx2 = nx-1; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+
+          // +x+2y
+          nx2 = nx; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
+
+          // +x-y
+          nx2 = nx; ny2 = ny; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
+
+          // -x+y
+          nx2 = nx-1; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+/*
+          // 2x - y
           nx2 = nx+1; ny2 = ny; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
-          // +x+y,1
+          // x + y
           nx2 = nx+1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][2] = connectivity[i1][n][2] = i2;
-          // -y,0
-          nx2 = nx; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          // -2x + y
+          nx2 = nx-1; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][3] = i2;
-          // -x,1
+          // -x - y
           nx2 = nx-1; ny2 = ny; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
+*/
         }
 
-
-        // third neighbors
+/* deactivatind non-diagonal third neighbor for now, because we are not using it for now
+        // third neighbors (non-diagonal)
         n = 2;
-        links[i1][n][0] = 2;//number of 2nd for a given site
+        links[i1][n][0] = 2;  //number of 2nd for a given site
         connectivity[i1][n][0] = 4;
 
         if( q==0 ) // first site in the unit cell
@@ -276,40 +383,68 @@ void lattice::set_kagome()
           nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][4] = i2;
         }
-
-        // diagonal neighbors (hexagon)
-        n = 3;
+*/
+        // diagonal neighbors (inside the hexagon)
+        n = 2;
         links[i1][n][0] = 1;//number of 2nd for a given site
         connectivity[i1][n][0] = 2;
 
         if( q==0 ) // first site in the unit cell
         {
-          // +y,0
-          nx2 = nx; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          // -2x
+          nx2 = nx-1; ny2 = ny; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
-          // -y,0
-          nx2 = nx; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+
+          // +2x
+          nx2 = nx+1; ny2 = ny; q2 = 0; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+/*
+          // 2x - 2y
+          nx2 = nx+1; ny2 = ny-1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -2x + 2y
+          nx2 = nx-1; ny2 = ny+1; q2 = 0; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+*/
         }
 
         if( q==1 ) // second site in the unit cell
         {
-          // +x+y,1
-          nx2 = nx+1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
-          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
-          // -x-y,1
+          // -2x-2y
           nx2 = nx-1; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+
+          // +2x+2y
+          nx2 = nx+1; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+/*
+          // 2y
+	  x2 = nx; ny2 = ny+1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+          // -2y
+          nx2 = nx; ny2 = ny-1; q2 = 1; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+*/
         }
 
         if( q==2 ) // third site in the unit cell
         {
-          // +x,2
+          // -2y
+          nx2 = nx; ny2 = ny-1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
+
+          // +2y
+          nx2 = nx; ny2 = ny+1; q2 = 2; torus(nx2, ny2);
+          i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+
+/*
+          // 2x
           nx2 = nx+1; ny2 = ny; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); links[i1][n][1] = connectivity[i1][n][1] = i2;
-          // -x,2
+          // -2x
           nx2 = nx-1; ny2 = ny; q2 = 2; torus(nx2, ny2);
           i2 = j(nx2, ny2, q2); connectivity[i1][n][2] = i2;
+*/
         }
 
       } //loop over sites in unit cell

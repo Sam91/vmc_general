@@ -18,8 +18,9 @@ void vmc::set_wf( wavefunction* wf)
 {
   mywf = wf;
   L = wf->getL(); L2 = L*L;
+  N = wf->getN();
 
-  wf->set_walk_length( L2 ); //sime integer multiple of L2 should be OK here (2x or 4x)
+  wf->set_walk_length( 2*N ); //sime integer multiple of N should be OK here (2x or 4x)
   //wf->set_mc_length( 40 );
 }
 

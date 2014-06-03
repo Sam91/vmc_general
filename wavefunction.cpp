@@ -20,7 +20,8 @@ wavefunction::wavefunction(int l, int q) //arguments: linear system size and sub
 
   //the number of operators we want to average over
 //  this->NO = Q*Q*L2; //here, we save all correlators, but average over lattice translations
-  NO = 4;
+  NO = 3;
+  //NO = 15;
 
   f0 = new double[NO];
   for(int no=0; no<NO; no++) f0[no] = 0.;
@@ -156,6 +157,7 @@ bool wavefunction::accept(complex<double> p)
 }
 
 int wavefunction::getL() {return L;}
+int wavefunction::getN() {return N;}
 
 //here we accumulate the observables to be measured
 void wavefunction::accumulate()
@@ -302,14 +304,14 @@ void wavefunction::print_avgs()
 {
   cout<< "ff={";
   for(int no=0; no<NO-1; no++) {
-    cout << std::fixed << setprecision(4) << average[no] << " pm " << sigma[no] << "\n";
+    cout << std::fixed << setprecision(5) << average[no] << " pm " << sigma[no] << "\n";
   }
-  cout << std::fixed << setprecision(4) << average[NO-1] << "};"<<endl;
+  cout << std::fixed << setprecision(5) << average[NO-1] << "};"<<endl;
   cout<< "ffsigma={";
   for(int no=0; no<NO; no++) {
-    cout << std::fixed << setprecision(4) << average[no] << " pm " << sigma[no] << "\n";
+    cout << std::fixed << setprecision(5) << average[no] << " pm " << sigma[no] << "\n";
   }
-  cout << std::fixed << setprecision(4) << sigma[NO-1] << "};"<<endl;
+  cout << std::fixed << setprecision(5) << sigma[NO-1] << "};"<<endl;
 }
 
 /*

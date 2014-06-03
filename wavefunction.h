@@ -54,6 +54,7 @@ public:
   virtual void print_avgs();
 
   int getL();
+  int getN();
   void print_alpha();
   void set_random_conf();
 

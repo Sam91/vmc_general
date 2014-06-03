@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-  int req_args = 3;
+  int req_args = 4;
 
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << endl;
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
 
-  myvmc->initialize(10); //number of bins to average over
+  myvmc->initialize( atoi(argv[4]) ); //number of bins to average over
   myvmc->run();
   myvmc->calculate_statistics();
 

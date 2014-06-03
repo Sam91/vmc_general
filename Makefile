@@ -1,13 +1,15 @@
 
 #MAIN = test
 #MAIN = main_u1
-MAIN = main_dirac
+#MAIN = main_dirac
+MAIN = main_u1real
 #MAIN = main_twoflavor
 #MAIN = main_u1hyb2
 #MAIN = main_he_col
 #MAIN = main_he1
 
-CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefunction.cpp vmc.cpp matrix.cpp mysql_wrapper.cpp spinone.cpp u1.cpp twoflavor.cpp u1two.cpp u1hybrid.cpp u1hybtwo.cpp paired2k.cpp u1dirac.cpp
+CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefunction.cpp vmc.cpp matrix.cpp mysql_wrapper.cpp spinone.cpp u1.cpp twoflavor.cpp u1two.cpp u1hybrid.cpp u1hybtwo.cpp paired2k.cpp u1real.cpp 
+#u1dirac.cpp
 
 LFLAGS = lib/libtmglib.a lib/liblapack.a lib/libblas.a lib/libmysqlcppconn.so -lm -lgfortran
 #LFLAGS = lib/libpfapack.a -llapack -lblas -lmysqlcppconn -lm -lgfortran
@@ -22,7 +24,8 @@ GCC = g++
 all:
 	@echo "Main is: " ${MAIN}
 	rm -f main*.o
-	${GCC} -c -Wall -O3 -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
+#	${GCC} -c -Wall -O3 -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
+	${GCC} -c -Wall -O3 -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
 	${GCC} -Wall -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 
 link:

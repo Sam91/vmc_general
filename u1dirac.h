@@ -21,7 +21,7 @@ public:
 
   virtual void print();
   virtual int insert_db();
-  virtual void print_avgs();
+//  virtual void print_avgs();
 
   void set_hopping();
   void set_hoppingk();
