@@ -258,12 +258,12 @@ int u1real::insert_db()
 
   std::ostringstream os;
 
-  os << "INSERT INTO liquid (id, sites, lattice, txtdsc, NS, N0, apx, apy, mc_length, nbin, TR, gR, ";
+  os << "INSERT INTO liquid (id, sites, lattice, txtdsc, NS, N0, apx, apy, mc_length, nbin, e2, TR, gR, ";
   os << "l3, l2, l1, xi1, xi2, xi3, dd1, dd2, dd3, a1, a2, a3, b1, b2, b3, ";
   os << "P1, dP1, P2, dP2, P3, dP3 ) VALUES (";
 
   os <<  "'', " << N << ", '" << alpha->mylattice->get_desc() << "', '" << pars->desc << "', " << NS << ", " << NF[0] << ", " << (int)pars->apx << ", " << (int)pars->apy << ", " << mc_length << ", " << nk << ", ";
-  os << (int)pars->TR << ", " << (int)pars->gR << ", ";
+  os << (int)pars->e2 << (int)pars->TR << ", " << (int)pars->gR << ", ";
 
   os << "round(" << mu[0] << ",3), round(" << pars->ll[2] << ",3), round(" << pars->ll[1] << ",3), ";
   os << "round(" << pars->xi[0] << ",3), round(" << pars->xi[1] << ",3), round(" << pars->xi[2] << ",3), ";

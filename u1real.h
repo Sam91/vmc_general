@@ -19,8 +19,7 @@ struct parameters : public baseparameters
 
   double *ll; //on-site term (chemical potential)
   
-  //unit-cell doubling
-  bool e2;
+  bool e2; //unit-cell doubling
 
   bool TR; //sign of MF under rotation
   int gR;  //SU(2) representation of rotation
