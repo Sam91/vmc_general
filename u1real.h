@@ -10,14 +10,20 @@
 //a structure containing relevant parameters of the wave function
 struct parameters : public baseparameters
 {
-  //first, second, and third neighbor hopping
-  double t1, t2, t3;
+  //first, second, and third neighbor mean fields
+  double *xi; //hoppping amplitude
+  double *dd; //pairing amplitude
 
+  double *a; //hopping phase
+  double *b; //pairing phase
+
+  double *ll; //on-site term (chemical potential)
+  
   //unit-cell doubling
   bool e2;
 
-  //sign of hopping under rotation
-  bool tr;
+  bool TR; //sign of MF under rotation
+  int gR;  //SU(2) representation of rotation
 };
 
 
@@ -40,7 +46,7 @@ public:
   parameters* pars;
 
 private:
-
+  bool rr; //some local parameter for U(1) states that tells me if the real part of the hopping is staggered
 };
 
 #endif

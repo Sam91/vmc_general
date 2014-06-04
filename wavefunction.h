@@ -21,8 +21,8 @@ struct baseparameters
 {
   int N; //Number of sites/factors in the local tensor product
 
-  string desc;
-  bool apx, apy;
+  string desc; //an english description of the state
+  bool apx, apy; //boundary conditions
 };
 
 class wavefunction

@@ -1,0 +1,7 @@
+//configure the mysql server/user here:
+
+  serverString = "tcp://huebeli.mysql.db.hostpoint.ch";
+  user = "user name";
+  passwd = "password";
+  db = "db name";
+

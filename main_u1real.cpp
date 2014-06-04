@@ -23,11 +23,11 @@ int main(int argc, char *argv[])
   wf->pars->apy = atoi(argv[3]);
 
   wf->pars->e2 = atoi(argv[4])==1 ? true : false ; // unit cell doubling
-  wf->pars->tr = atoi(argv[5])==1 ? true : false ; // rotation breaking (staggering of hopping in the hexagon)
+  wf->pars->TR = atoi(argv[5])==1 ? true : false ; // rotation breaking (staggering of hopping in the hexagon)
 
-  wf->pars->t1 = ((double)atoi(argv[6]))/100.; // real hopping parameter on one link
-  wf->pars->t2 = ((double)atoi(argv[7]))/100.;
-  wf->pars->t3 = ((double)atoi(argv[8]))/100.;
+  wf->pars->xi[0] = ((double)atoi(argv[6]))/100.; // real hopping parameter on one link
+  wf->pars->xi[1] = ((double)atoi(argv[7]))/100.;
+  wf->pars->xi[2] = ((double)atoi(argv[8]))/100.;
 
   wf->set_lattice( "kagome" );
   wf->set_hoppingk( ((double)atoi(argv[9]))/100. );
@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
   myvmc->initialize( atoi(argv[10]) ); //number of bins to average over
   myvmc->run();
   myvmc->calculate_statistics();
+  wf->insert_db();
 
   cout <<"exiting"<<endl;
 
