@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <sys/types.h>
 #include <unistd.h>
-#include "u1real.h"
+#include "u1compl.h"
 
 //Here, we want to scant the ratios r1/r2 in a reasonable range
 
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
 
-  u1real* wf = new u1real( L, 3 );
+  u1compl* wf = new u1compl( L, 3 );
 
   wf->pars->apx = atoi(argv[2]); // P/AP boundary conditions
   wf->pars->apy = atoi(argv[3]);

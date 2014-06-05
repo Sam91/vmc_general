@@ -45,7 +45,7 @@ public:
   parameters* pars;
 
 private:
-  bool rr; //some local parameter for U(1) states that tells me if the real part of the hopping is staggered
+
 };
 
 #endif

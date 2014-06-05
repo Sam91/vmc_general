@@ -62,6 +62,7 @@ void u1real::set_hoppingk(double mu0)
     exit(-1);
   }
 
+  bool rr;
   if( pars->gR==0 || pars->gR==3 ) rr = pars->TR;
   else rr = !pars->TR;
 
