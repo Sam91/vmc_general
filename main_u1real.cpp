@@ -33,21 +33,24 @@ int main(int argc, char *argv[])
   wf->set_hoppingk( ((double)atoi(argv[9]))/100. );
   wf->set_mc_length( 80 );
 
-  wf->findmu();
   //wf->setmu(-.2427);
-  wf->print();
+  if( wf->findmu()>-1 )
+  {
+    wf->print();
 
-  vmc* myvmc = new vmc();
-  myvmc->set_wf( wf );
+    vmc* myvmc = new vmc();
+    myvmc->set_wf( wf );
 
-  myvmc->initialize( atoi(argv[10]) ); //number of bins to average over
-  myvmc->run();
-  myvmc->calculate_statistics();
-  wf->insert_db();
+    myvmc->initialize( atoi(argv[10]) ); //number of bins to average over
+    myvmc->run();
+    myvmc->calculate_statistics();
+    wf->insert_db();
+
+    delete myvmc;
+  }
 
   cout <<"exiting"<<endl;
 
-  delete myvmc;
   delete wf;
   return 0;
 

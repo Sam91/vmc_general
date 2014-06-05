@@ -261,7 +261,7 @@ void u1hybrid::create_ad()
 void u1hybrid::set_h(double h0) {cout << "Setting h to " << h0 << "\n"; h = h0;}
 
 //this function tries to find an apropriate chemical potential mu[0] such that the avg flavor number before projections has N[0]=N[1]
-void u1hybrid::findmu()
+int u1hybrid::findmu()
 {
   int n, nmax;
   cout << "Entering findmu();\n";
@@ -285,7 +285,11 @@ void u1hybrid::findmu()
         t[n][n][i][i] = -mu[n];
   }
 
-  if(n==nmax) cout << "No apropriate mu_z found...\n";
+  if(n==nmax) {
+    cout << "No apropriate mu_z found...\n";
+    return -1;
+  }
+  return 0;
 }
 
 //set a 0-flux t-t' hopping state on some lattice torus (make sure the lattice has been set)
@@ -351,7 +355,7 @@ void u1hybrid::set_hopping3(double* tt1, double* tt2, bool ap)
   }
 }
 
-void u1hybrid::findmu( int nz ) //tries to find a mu[0] such that Nz = nz before projection
+int u1hybrid::findmu( int nz ) //tries to find a mu[0] such that Nz = nz before projection
 {
   int n, nmax;
   cout << "Entering findmu(" << nz << ");\n";
@@ -399,7 +403,11 @@ void u1hybrid::findmu( int nz ) //tries to find a mu[0] such that Nz = nz before
         t[n][n][i][i] = -mu[n];
   }
 
-  if(n==nmax) cout << "No apropriate muz found...\n";
+  if(n==nmax) {
+    cout << "No apropriate muz found...\n";
+    return -1;
+  }
+  return 0;
 }
 
 void u1hybrid::backup_data()

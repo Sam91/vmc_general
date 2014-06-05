@@ -32,8 +32,8 @@ public:
   virtual void restore_data();
 
   void find_max_conf();
-  void findmu();
-  void findmu(int);
+  int findmu();
+  int findmu(int);
   void set_h(double);
   
   virtual void correct_cff(bool);

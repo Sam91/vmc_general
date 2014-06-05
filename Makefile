@@ -2,7 +2,8 @@
 #MAIN = test
 #MAIN = main_u1
 #MAIN = main_dirac
-MAIN = main_u1real
+#MAIN = main_u1real
+MAIN = main_u1real_scan12
 #MAIN = main_twoflavor
 #MAIN = main_u1hyb2
 #MAIN = main_he_col

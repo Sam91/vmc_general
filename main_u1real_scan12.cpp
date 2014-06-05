@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   wf->set_lattice( "kagome" );
   wf->set_mc_length( 80 );
 
-  for(int r=r0; r<=r1; r++)
+  for( int r=r0; r<=r1; r+=2 )
   {
     wf->pars->xi[0] = (double)r/100.;
     wf->pars->xi[1] = (double)(rtot - r)/100.;
