@@ -4,8 +4,8 @@
 
 //Real hopping on Kagome lattice
 
-#ifndef U1REAL_H
-#define U1REAL_H
+#ifndef U1KAGOME_H
+#define U1KAGOME_H
 
 //a structure containing relevant parameters of the wave function
 struct parameters : public baseparameters
@@ -26,11 +26,11 @@ struct parameters : public baseparameters
 };
 
 
-class u1real : public u1hybrid
+class u1kagome : public u1hybrid
 {
 public:
-  u1real(int, int);
-  ~u1real();
+  u1kagome(int, int);
+  ~u1kagome();
 
   virtual void print();
   virtual int insert_db();
