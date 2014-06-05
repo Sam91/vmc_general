@@ -36,14 +36,25 @@ int main(int argc, char *argv[])
   int r0 = atoi(argv[6]);
   int r1 = atoi(argv[7]);
   int rtot = atoi(argv[8]);
+  if( r1<r0 ) {
+    cout << "ERROR: We need r1 > r0." << endl;
+    exit( -1 );
+  }
+
+  cout << "Scanning with r = " << r0 << " ... " << r1 << "; rtot=" << rtot << endl;
 
   wf->set_lattice( "kagome" );
   wf->set_mc_length( 80 );
 
+  if( wf->pars->e2 )
+    wf->pars->desc = "U(1) Dirac";
+  else
+    wf->pars->desc = "U(1) FS";
+
   for( int r=r0; r<=r1; r+=2 )
   {
-    wf->pars->xi[0] = (double)r/100.;
-    wf->pars->xi[1] = (double)(rtot - r)/100.;
+    wf->pars->xi[0] = (double)(rtot-abs(r))/100.;
+    wf->pars->xi[1] = (double)r/100.;
 
     wf->print();
     wf->set_hoppingk( ((double)atoi(argv[10]))/100. );
