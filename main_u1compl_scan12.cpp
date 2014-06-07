@@ -4,11 +4,12 @@
 #include <unistd.h>
 #include "u1kagome.h"
 
-//Here, we want to scant the ratios r1/r2 in a reasonable range
+//Here, we want to scan the ratios r1/r2 in a reasonable range
+// This is meant to be compiled with WFC=1
 
 int main(int argc, char *argv[])
 {
-  int req_args = 11;
+  int req_args = 12;
 
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << endl;
@@ -31,40 +32,51 @@ int main(int argc, char *argv[])
 
 //  wf->pars->xi[0] = ((double)atoi(argv[6]))/100.; // real hopping parameter on one link
 //  wf->pars->xi[1] = ((double)atoi(argv[7]))/100.;
-  wf->pars->xi[2] = ((double)atoi(argv[9]))/100.;
 
-  int r0 = atoi(argv[6]);
-  int r1 = atoi(argv[7]);
-  int rtot = atoi(argv[8]);
-  if( r1<r0 ) {
-    cout << "ERROR: We need r1 > r0." << endl;
+  int rtot = atoi(argv[6]); //total xi1 + |xi2|
+  int sgn = atoi(argv[7]);  //sign of xi2 to scan
+  if( rtot<0 ) {
+    cout << "ERROR: We need rmax > 0." << endl;
     exit( -1 );
   }
 
-  cout << "Scanning with r = " << r0 << " ... " << r1 << "; rtot=" << rtot << endl;
+  wf->pars->xi[2] = ((double)atoi(argv[8]))/100.; //xi3 is fixed
+
+  wf->pars->a[0] = ((double)atoi(argv[ 9]))/100.; //phase of hopping in units of Pi
+  wf->pars->a[1] = ((double)atoi(argv[10]))/100.; 
+  wf->pars->a[2] = ((double)atoi(argv[11]))/100.; 
+
+  int r0=1;
+  if( sgn == -1 ) {
+    cout << "Scanning with xi2 = " << -2 << " ... -" << rtot << "." << endl;
+    r0 = 2;
+  } else {
+    cout << "Scanning with xi2 = " << 0 << " ... " << rtot << "." << endl;
+    r0 = 0;
+  }
 
   wf->set_lattice( "kagome" );
   wf->set_mc_length( 80 );
 
   if( wf->pars->e2 )
-    wf->pars->desc = "U(1) Dirac - c";
+    wf->pars->desc = "U(1) Dirac";
   else
-    wf->pars->desc = "U(1) FS - c";
+    wf->pars->desc = "U(1) FS";
 
-  for( int r=r0; r<=r1; r+=2 )
+  for( int r=r0; r <= rtot; r += 2 )
   {
-    wf->pars->xi[0] = (double)(rtot-abs(r))/100.;
-    wf->pars->xi[1] = (double)r/100.;
+    wf->pars->xi[0] = (double)(rtot-r)/100.;
+    wf->pars->xi[1] = (double)(sgn*r)/100.;
 
     wf->print();
-    wf->set_hoppingk( ((double)atoi(argv[10]))/100. );
+    wf->set_hoppingk( 0. );
 
     if( wf->findmu()>-1 )
     {
       vmc* myvmc = new vmc();
       myvmc->set_wf( wf );
 
-      myvmc->initialize( atoi(argv[11]) ); //number of bins to average over
+      myvmc->initialize( atoi(argv[12]) ); //number of bins to average over
       myvmc->run();
       myvmc->calculate_statistics();
       wf->insert_db();
@@ -75,40 +87,10 @@ int main(int argc, char *argv[])
     }
   }
 
-  cout <<"exiting"<<endl;
+  cout << "exiting." << endl;
 
   delete wf;
   return 0;
 
 }
-/*
-  wf->pars->apx = atoi(argv[2]); //boundary condition in x-direction
-  wf->pars->apy = atoi(argv[3]);
-  
-  //wf->print();
 
-  //create a vmc object and assign the wf
-  vmc* myvmc = new vmc();
-  wf->set_mc_length( 300 );
-  myvmc->set_wf( wf );
-
-
-  wf->findmu();
-
-  //wf->create_dd();
-  //wf->create_ad();
-
-  if( argc>=12 ) myvmc->initialize( atoi(argv[11]) ); //number of bins to average over
-  else myvmc->initialize( 30 ); //number of bins to average over
-
-  myvmc->run();
-
-  myvmc->calculate_statistics();
-
-//  wf->insert_db();
-
-  delete myvmc;
-  delete wf;
-  return 0;
-}
-*/

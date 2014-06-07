@@ -56,6 +56,9 @@ void u1kagome::set_hoppingk(double mu0)
   cout << "gR = "<< pars->gR << endl;
 
   cout << "xi = ["<< pars->xi[0] << "; " << pars->xi[1] << "; " << pars->xi[2] << "]" << endl;
+#if WFC
+  cout << " a = ["<< pars->a[0] << "; " << pars->a[1] << "; " << pars->a[2] << "]" << endl;
+#endif
 
   if( pars->gR<0 || pars->gR>3 ) {
     cout << "ERROR: invalid value of gR\n";
