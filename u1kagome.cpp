@@ -97,16 +97,19 @@ void u1kagome::set_hoppingk(double mu0)
         alpha->mylattice->getnq(nx2, ny2, q2, i2); // get the cartesian coordinates for i2
 
         // set hopping on nearest neighbors according to the rotation sign (note that the chosen link order is important here)
-        if( (q1==0 && k==1)||(q1==1 && k==2)||(q1==2 && k==1) )
+        if( (q1==0 && k==1)||(q1==1 && k==2)||(q1==2 && k==1) ) {
 #if WFC
-          t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[0]*complex<double>( srr*cos(M_PI*pars->a[0]), sri*sin(M_PI*pars->a[0]) );
-        else
-          t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[0]*complex<double>( cos(M_PI*pars->a[0]), sin(M_PI*pars->a[0]) );
+          t[n][n][i1][i2] = pars->xi[0]*complex<double>( srr*cos(M_PI*pars->a[0]), +sri*sin(M_PI*pars->a[0]) );
+          t[n][n][i2][i1] = pars->xi[0]*complex<double>( srr*cos(M_PI*pars->a[0]), -sri*sin(M_PI*pars->a[0]) );
+        } else {
+          t[n][n][i1][i2] = pars->xi[0]*complex<double>( cos(M_PI*pars->a[0]), +sin(M_PI*pars->a[0]) );
+          t[n][n][i2][i1] = pars->xi[0]*complex<double>( cos(M_PI*pars->a[0]), -sin(M_PI*pars->a[0]) );
 #else
           t[n][n][i1][i2] = t[n][n][i2][i1] = srr*pars->xi[0];
-        else
+        } else {
           t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[0];
 #endif
+        }
 
         if( pars->e2 ) // unit cell doubling
         {
@@ -143,16 +146,19 @@ void u1kagome::set_hoppingk(double mu0)
         alpha->mylattice->getnq(nx2, ny2, q2, i2); //get the cartesian coordinates for i2
 
         //set hopping on second neighbors according to rotation sign
-        if( (q1==0 && k==1)||(q1==1 && k==2)||(q1==2 && k==1) )
+        if( (q1==0 && k==1)||(q1==1 && k==2)||(q1==2 && k==1) ) {
 #if WFC
-          t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[1]*complex<double>( srr*cos(M_PI*pars->a[1]), sri*sin(M_PI*pars->a[1]) );
-        else
-          t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[1]*complex<double>( cos(M_PI*pars->a[1]), sin(M_PI*pars->a[1]) );
+          t[n][n][i1][i2] = pars->xi[1]*complex<double>( srr*cos(M_PI*pars->a[1]), +sri*sin(M_PI*pars->a[1]) );
+          t[n][n][i2][i1] = pars->xi[1]*complex<double>( srr*cos(M_PI*pars->a[1]), -sri*sin(M_PI*pars->a[1]) );
+        } else {
+          t[n][n][i1][i2] = pars->xi[1]*complex<double>( cos(M_PI*pars->a[1]), +sin(M_PI*pars->a[1]) );
+          t[n][n][i2][i1] = pars->xi[1]*complex<double>( cos(M_PI*pars->a[1]), -sin(M_PI*pars->a[1]) );
 #else
           t[n][n][i1][i2] = t[n][n][i2][i1] = srr*pars->xi[1];
-        else
+        } else {
           t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[1];
 #endif
+        }
 
         if( pars->e2 ) //unit cell doubling
         {
@@ -185,16 +191,19 @@ void u1kagome::set_hoppingk(double mu0)
         alpha->mylattice->getnq(nx2, ny2, q2, i2); //get the cartesian coordinates for i2
 
         //setting hopping to one on all third neighbors
-        if( q1!=1 )
+        if( q1!=1 ) {
 #if WFC
-          t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[2]*complex<double>( srr*cos(M_PI*pars->a[2]), sri*sin(M_PI*pars->a[2]) );
-        else
-          t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[2]*complex<double>( cos(M_PI*pars->a[2]), sin(M_PI*pars->a[2]) );
+          t[n][n][i1][i2] = pars->xi[2]*complex<double>( srr*cos(M_PI*pars->a[2]), +sri*sin(M_PI*pars->a[2]) );
+          t[n][n][i2][i1] = pars->xi[2]*complex<double>( srr*cos(M_PI*pars->a[2]), -sri*sin(M_PI*pars->a[2]) );
+        } else {
+          t[n][n][i1][i2] = pars->xi[2]*complex<double>( cos(M_PI*pars->a[2]), +sin(M_PI*pars->a[2]) );
+          t[n][n][i2][i1] = pars->xi[2]*complex<double>( cos(M_PI*pars->a[2]), -sin(M_PI*pars->a[2]) );
 #else
           t[n][n][i1][i2] = t[n][n][i2][i1] = srr*pars->xi[2];
-        else
+        } else {
           t[n][n][i1][i2] = t[n][n][i2][i1] = pars->xi[2];
 #endif
+        }
 
         if( pars->e2 ) //unit cell doubling
         {

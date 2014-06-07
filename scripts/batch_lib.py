@@ -21,6 +21,10 @@ def sshexc(server, cmd):
 
 # Find the number of cpus and processors per server
 def findservers():
+
+  #fraction of idle CPUs to be used
+  r = 0.8
+
   ntot = 0
   ctot = 0
   nused = 0
@@ -52,9 +56,9 @@ def findservers():
     #calculate the number of jobs we want to sumbit to this server
     ucpu = float(ncpu)*idle/100.
     if nproc>0:
-      nsub =  max([0, int(round(ucpu/2)) - nproc])
+      nsub =  max([0, int(round(r*ucpu)) - nproc])
     else:
-      nsub = max([1,int(round(ucpu/2))])
+      nsub = max([1,int(round(r*ucpu))])
 
     nservers[ s ] = [ncpu, nproc, idle, nsub]
 
@@ -64,6 +68,7 @@ def findservers():
 
   print "------------"
   print "We can potentially run "+ str(ntot) +" more jobs; "+ str(nused) +" currently running. CPUs: "+ str(ctot)
+  print "------------"
 
   saveservers( nservers )
   return nservers

@@ -157,6 +157,13 @@ void u1hybrid::create_ad()
   cout << "\n";
 */
 
+#if WFC
+  for(int i=0; i<N*NS; i++) {
+    if( abs(imag(v[i])) > 1e-3 )
+      cout << "WARN: imaginary eigenvalue " << v[i] << endl;
+  }
+#endif
+
   //First, get the avg flavor number per eigenstate
   for(int ne=0; ne<NS*N; ne++) //loop over eigenvectors
   {
@@ -534,7 +541,7 @@ double u1hybrid::swap(int i1, int i2, bool ratio)
     if( abs(wf)<SMALL )
     {
       if( ratio ) { cout << "ERROR: incorrect ratio for vanishing wf! (wf="<< wf << ")\n"; exit(-1);}
-      cout << "vanishing wf prior to swap... calculating from scratch ("<< wf << ")\n";
+      cout << "vanishing wf prior to swap... calculating from scratch ["<< wf << "]\n";
 
       //swap in lconf
       int c = alpha->lconf[i1]; alpha->lconf[i1] = alpha->lconf[i2]; alpha->lconf[i2] = c;
