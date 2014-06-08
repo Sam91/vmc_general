@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+#takes a task file as argument and updates the status of each job
+
 import sys
 from batch_lib import *
 
@@ -9,14 +11,5 @@ tasklist = pickle.load( open(taskfile, "rb" ) )
 
 checktasks( tasklist )
 
-#submit(tasklist)
-
-#pickle.dump(tasklist, open(taskfile, "wb"))
-
-#killall(tasklist, 'cyclope')
-
-#killjobs('sbieri', 'elektra')
-
-#print tasklist
-
+pickle.dump(tasklist, open(taskfile, "wb"))
 

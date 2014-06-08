@@ -2,10 +2,15 @@
 
 import subprocess
 import pickle
+import time
 
-servers = {'cyclope','thorgal','elektra','ghast','lockheed','christopher','mimic','dora','marrow','tapir','vega','beryl','cavallieri','wilbur','ember','colossus','yumi','pyro','bosons','trasses','callisto','polaris','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine',}
+import smtplib
+from email.mime.text import MIMEText
 
-#removing 'haurele' which is down.
+
+servers = {'cyclope','thorgal','elektra','ghast','lockheed','christopher','mimic','dora','marrow','tapir','vega','beryl','cavallieri','wilbur','ember','colossus','yumi','pyro','bosons','trasses','callisto','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine',}
+
+#down: 'haurele', 'polaris'
 
 servers2 = {'cyclope','thorgal','elektra',}
 
@@ -22,17 +27,20 @@ def sshexc(server, cmd):
 # Find the number of cpus and processors per server
 def findservers():
 
-  #fraction of idle CPUs to be used
+  #fraction of CPUs to be used
   r = 0.8
 
   ntot = 0
   ctot = 0
   nused = 0
 
+  print("Checking servers on "+ time.strftime("%d/%m/%y %H:%M:%S") )
+  print("--------------------")
+
   nservers = {}
   for s in servers:
 
-    sshexc(s, "sleep 0") #dummy command to get the hostkey
+    #sshexc(s, "sleep 0") #dummy command to get the hostkey
 
     out = sshexc(s, "grep processor /proc/cpuinfo |wc -l")
     try:
@@ -54,11 +62,14 @@ def findservers():
     print s + " has " + str(ncpu) + " CPUs and "+ str(nproc) + " running processes, idle = "+ str(idle)
 
     #calculate the number of jobs we want to sumbit to this server
-    ucpu = float(ncpu)*idle/100.
-    if nproc>0:
-      nsub =  max([0, int(round(r*ucpu)) - nproc])
+    #theoretical maximum
+    nmax = max([0, int(round(r*float(ncpu)))-nproc])
+    if nmax>0:
+      nsub = max([0, int(round((idle/100.+r-1.)*float(ncpu)))])
     else:
-      nsub = max([1,int(round(r*ucpu))])
+      nsub = 0
+    if nsub > nmax:
+      nsub = nmax
 
     nservers[ s ] = [ncpu, nproc, idle, nsub]
 
@@ -96,16 +107,22 @@ def submit( tasklist ):
   nservers = findservers()
   #nservers = loadservers()
 
-  tasks = tasklist.keys()
+  tasks = sorted(tasklist.keys())
   nsub = 0
+  waitingjob = 0
+
+  dt = time.strftime("%d/%m/%y %H:%M:%S")
+  print("Submitting tasks on "+ dt )
+  print("--------------------")
 
   for t in tasks:
     cmd = tasklist[ t ][0]
     srv = tasklist[ t ][1]
 
     if len(srv) > 0:
-      print "Task '"+ t +"' has already been submitted to '"+ srv +"'."
+      #print "Task '"+ t +"' has already been submitted to '"+ srv +"'."
       continue
+    waitingjob = waitingjob + 1
 
     host = gethost(nservers) #get host that has a free slot
     if( len(host)<1 ):
@@ -113,7 +130,12 @@ def submit( tasklist ):
 
     fcmd = 'vmc_general/scripts/local_submit.sh \''+ cmd +'\''
 
-    pid = int(sshexc(host, fcmd))
+    out = sshexc(host, fcmd)
+    try:
+      pid = int(out)
+    except:
+      print("Unable to parse pid: "+ out)
+      continue
     print host +"/"+ str(pid) +": "+ fcmd
 
     nservers[ host ][3] = nservers[ host ][3]-1
@@ -121,13 +143,24 @@ def submit( tasklist ):
 
     tasklist[ t ][1] = host
     tasklist[ t ][2] = pid
+    tasklist[ t ][3] = 'running'
     nsub = nsub+1
 
   #print tasklist
+  print "--------------------"
   print "Submitted "+ str(nsub) +" jobs."
+  print "--------------------"
+
+  if nsub==0 and waitingjob==0:
+    print('All pending jobs are submitted!')
+    sendmail('All jobs submitted', 'All pending jobs for this tasklist have been submitted as of '+ dt)
 
   #save the updated servers list
   saveservers( nservers )
+
+  #check the running tasks
+  checktasks( tasklist )
+
   return tasklist
 
 #kill all submitted processed in the tasklist
@@ -161,13 +194,28 @@ def checktasks( tasklist ):
   running = 0
   notsub = 0
   unreachable = 0
-  allkeys = tasklist.keys()
+  allkeys = sorted(tasklist.keys())
+
+  tmsg = "Checking tasks on "+ time.strftime("%d/%m/%y %H:%M:%S")
+  print( tmsg )
 
   for t in allkeys:
     srv = tasklist[t][1]
     if len(srv)<1:
-      notsub = notsub+1
+      notsub = notsub + 1
       continue
+
+    stat = tasklist[t][3]
+    if stat=='done':
+      done = done + 1
+      continue
+    if stat=='unreachable':
+      unreachable = unreachable + 1
+      continue
+    if stat!='running':
+      print("Warn: unknown state '"+ stat +"'")
+      continue
+
     pid = tasklist[t][2]
     out = sshexc(srv, "ps -fe|grep 'bin/main_u1'|grep '"+ str(pid) +"'|grep -v grep|wc -l" )
     try:
@@ -175,18 +223,29 @@ def checktasks( tasklist ):
     except:
       print( "Server '"+ srv +"' unreachable: "+ out )
       unreachable = unreachable+1
+      tasklist[t][3] = 'unreachable'
       continue
     if r==1:
-      running = running+1
+      running = running + 1
     else:
       if r==0:
-        done = done +1
+        done = done + 1
+        tasklist[t][3] = 'done'
       else:
         print "Warn: more than one jobs ("+ str(r) +") for "+ srv +"/"+ str(pid)
 
   n = len(allkeys)
-  print("Out of "+ str(n) +" tasks, "+ str(n-notsub) +" have been submitted; "+str(unreachable) +" are unreachable, "+ str(running) +" are running, and "+ str(done) +" are done.")
+  #msg = "Out of "+ str(n) +" tasks, "+ str(n-notsub) +" have been submitted; "+str(unreachable) +" are unreachable, "+ str(running) +" are running, and "+ str(done) +" are done."
+  msg = "Total: "+ str(n) +"\nSubmitted: "+ str(n-notsub) +"\nUnreachable: "+ str(unreachable) +"\nRunning: "+ str(running) +"\nDone: "+ str(done)
 
+  print( msg )
+  sendmail('checktask report', tmsg +"\n"+ msg)
+
+  #Send info mail when all jobs are done
+  if done+unreachable>n:
+    sendmail('All jobs done!', 'Happy :)' )
+
+  return tasklist
 
 #Kill all jobs of a user on a specific server (be careful)
 def killjobs(user, server):
@@ -196,4 +255,19 @@ def killjobs(user, server):
 
   print "Killed alll jobs of '"+ user +"' on '"+ server +"'"
 
+#send a mail to predefined user
+def sendmail(subj, txt):
+
+  msg = MIMEText( txt )
+
+  me = 'sbieri@lptl.jussieu.fr'
+  you = 'sbieri@lptl.jussieu.fr'
+
+  msg['Subject'] = subj
+  msg['From'] = me
+  msg['To'] = you
+
+  s = smtplib.SMTP('bambi.lptl.jussieu.fr')
+  s.sendmail(me, [you], msg.as_string())
+  s.quit()
 
