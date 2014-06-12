@@ -26,7 +26,7 @@ public:
 private:
   wavefunction *mywf;
 
-  int L, L2, N;
+  int L, LD, N;
   int nk, runs;
 
   double **f;

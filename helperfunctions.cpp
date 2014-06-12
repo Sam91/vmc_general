@@ -314,3 +314,8 @@ double bisect(double (*f)(double,double,double), double a, double b, double arg1
   return am;
 }
 
+int factorial(int n)
+{
+  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+}
+

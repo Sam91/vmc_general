@@ -1,5 +1,4 @@
 #include "u1kagome.h"
-#include "spinone.h"
 #include <iomanip>
 
 // Define an unpaired real fermionic state on the Kagome lattice with first, second, and diagonal neighbor hopping
@@ -12,8 +11,10 @@ u1kagome::u1kagome(int l, int q) : u1hybrid( l, q )
 
   pars->N = N;
 
+  pars->ap = new bool[DIM];
+
 //set the default values
-  pars->apx = false; pars->apy = false;
+  pars->ap[0] = false; pars->ap[1] = false;
 
   pars->e2 = false;
   pars->TR = false;
@@ -29,16 +30,18 @@ u1kagome::u1kagome(int l, int q) : u1hybrid( l, q )
 
 u1kagome::~u1kagome()
 {
-  bpars = NULL;
   delete[] pars->xi; delete[] pars->dd;
   delete[] pars->a; delete[] pars->b;
+  delete[] pars->ap;
+
+  bpars = NULL;
   delete pars;
 }
 
 //set a 0-flux t-t' hopping state on some lattice torus (make sure the lattice has been set)
 void u1kagome::set_hopping()
 {
-  u1hybrid::set_hopping(1., 0, pars->apx);
+  u1hybrid::set_hopping(1., 0, pars->ap[0]);
 }
 
 //set a real t1-t2-t3 hopping state on Kagome 
@@ -48,9 +51,9 @@ void u1kagome::set_hoppingk(double mu0)
   for(int n=0; n<NS; n++) mu[n] = mu0;
 
   int i2;
-  int nx2, ny2, q2, nx1, ny1, q1;
+  int q1, q2;
 
-  cout << "ap = ["<< pars->apx << "; " << pars->apy << "]" << endl;
+  cout << "ap = ["<< pars->ap[0] << "; " << pars->ap[1] << "]" << endl;
   cout << "e2 = "<< pars->e2 << endl;
   cout << "TR = "<< pars->TR << endl;
   cout << "gR = "<< pars->gR << endl;
@@ -78,12 +81,15 @@ void u1kagome::set_hoppingk(double mu0)
   //set the hopping matrix to zero
   for(int i=0; i<N; i++)
     for(int j=0; j<N; j++)
-      for(int n1=0; n1<NS; n1++)
-        for(int n2=0; n2<NS; n2++) t[n1][n2][i][j] = 0.;
+      for(int nn1=0; nn1<NS; nn1++)
+        for(int nn2=0; nn2<NS; nn2++) t[nn1][nn2][i][j] = 0.;
+
+  int *n1 = new int[DIM];
+  int *n2 = new int[DIM];
 
   for(int i1=0; i1<N; i1++) //loop over all sites
   {
-    alpha->mylattice->getnq(nx1, ny1, q1, i1); //get the carthesian coordinates for i1.
+    alpha->mylattice->getnq(n1, q1, i1); //get the carthesian coordinates for i1.
 
     for(int n=0; n<NS; n++) //loop over flavors (two)
     {
@@ -94,7 +100,7 @@ void u1kagome::set_hoppingk(double mu0)
 
         //cout<<"i1="<<i1<<"; i2="<<i2<<"; k="<<k<<endl;
 
-        alpha->mylattice->getnq(nx2, ny2, q2, i2); // get the cartesian coordinates for i2
+        alpha->mylattice->getnq(n2, q2, i2); // get the cartesian coordinates for i2
 
         // set hopping on nearest neighbors according to the rotation sign (note that the chosen link order is important here)
         if( (q1==0 && k==1)||(q1==1 && k==2)||(q1==2 && k==1) ) {
@@ -117,7 +123,7 @@ void u1kagome::set_hoppingk(double mu0)
               t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
           }
 
-          if( ny1%2==0 ) {
+          if( (n1[1])%2==0 ) {
             if( q1==1 && k==2 ) {
               t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
             }
@@ -128,10 +134,10 @@ void u1kagome::set_hoppingk(double mu0)
         }
 
         // boundary conditions
-        if( pars->apx && ( abs(nx1 - nx2) > L/2 ) ) {
+        if( pars->ap[0] && ( abs(n1[0] - n2[0]) > L/2 ) ) {
           t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
         }
-        if( pars->apy && ( abs(ny1 - ny2) > L/2 ) ) {
+        if( pars->ap[1] && ( abs(n1[1] - n2[1]) > L/2 ) ) {
           t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
         }
       } //end loop first neighbors
@@ -143,7 +149,7 @@ void u1kagome::set_hoppingk(double mu0)
 
         //cout<<"i1="<<i1<<"; i2="<<i2<<"; k="<<k<<endl;
 
-        alpha->mylattice->getnq(nx2, ny2, q2, i2); //get the cartesian coordinates for i2
+        alpha->mylattice->getnq(n2, q2, i2); //get the cartesian coordinates for i2
 
         //set hopping on second neighbors according to rotation sign
         if( (q1==0 && k==1)||(q1==1 && k==2)||(q1==2 && k==1) ) {
@@ -162,7 +168,7 @@ void u1kagome::set_hoppingk(double mu0)
 
         if( pars->e2 ) //unit cell doubling
         {
-          if( ny1%2==0 ) {
+          if( (n1[1])%2==0 ) {
             if( (q1==0 && k==2) || (q1==1 && k==2) || (q1==2 && k==1) ) {
               t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
             }
@@ -173,10 +179,10 @@ void u1kagome::set_hoppingk(double mu0)
         }
 
         // boundary conditions
-        if( pars->apx && ( abs(nx1 - nx2) > L/2 ) ) {
+        if( pars->ap[0] && ( abs(n1[0] - n2[0]) > L/2 ) ) {
           t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
         }
-        if( pars->apy && ( abs(ny1 - ny2) > L/2 ) ) {
+        if( pars->ap[1] && ( abs(n1[1] - n2[1]) > L/2 ) ) {
           t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
         }
       } //end loop second neighbors
@@ -188,7 +194,7 @@ void u1kagome::set_hoppingk(double mu0)
 
         //cout<<"i1="<<i1<<"; i2="<<i2<<"; k="<<k<<endl;
 
-        alpha->mylattice->getnq(nx2, ny2, q2, i2); //get the cartesian coordinates for i2
+        alpha->mylattice->getnq(n2, q2, i2); //get the cartesian coordinates for i2
 
         //setting hopping to one on all third neighbors
         if( q1!=1 ) {
@@ -207,7 +213,7 @@ void u1kagome::set_hoppingk(double mu0)
 
         if( pars->e2 ) //unit cell doubling
         {
-          if( ny1%2==0 ) {
+          if( (n1[1])%2==0 ) {
             if( q1==2 ) {
               t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
             }
@@ -218,22 +224,23 @@ void u1kagome::set_hoppingk(double mu0)
         }
 
         // boundary conditions
-        if( pars->apx && ( abs(nx1 - nx2) > L/2 ) ) {
+        if( pars->ap[0] && ( abs(n1[0] - n2[0]) > L/2 ) ) {
           t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
         }
-        if( pars->apy && ( abs(ny1 - ny2) > L/2 ) ) {
+        if( pars->ap[1] && ( abs(n1[1] - n2[1]) > L/2 ) ) {
           t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
         }
       } //end loop third neighbors
 
-
     } //end loop flavors
   } //end loop sites
+
+  delete[] n1; delete[] n2;
 }
 
 void u1kagome::set_hopping3(double *tt1, double *tt2)
 {
-  u1hybrid::set_hopping3(tt1, tt2, pars->apx);
+  u1hybrid::set_hopping3(tt1, tt2, pars->ap[0]);
 }
 
 void u1kagome::print() {}
@@ -262,7 +269,7 @@ int u1kagome::insert_db()
   os << "l3, l2, l1, xi1, xi2, xi3, dd1, dd2, dd3, a1, a2, a3, b1, b2, b3, ";
   os << "P1, dP1, P2, dP2, P3, dP3 ) VALUES (";
 
-  os <<  "'', " << N << ", '" << alpha->mylattice->get_desc() << "', '" << pars->desc << "', " << NS << ", " << NF[0] << ", " << (int)pars->apx << ", " << (int)pars->apy << ", " << mc_length << ", " << nk << ", ";
+  os <<  "'', " << N << ", '" << alpha->mylattice->get_desc() << "', '" << pars->desc << "', " << NS << ", " << NF[0] << ", " << (int)pars->ap[0] << ", " << (int)pars->ap[1] << ", " << mc_length << ", " << nk << ", ";
   os << (int)pars->e2 << ", " << (int)pars->TR << ", " << (int)pars->gR << ", ";
 
   os << "round(" << mu[0] << ",3), round(" << pars->ll[2] << ",3), round(" << pars->ll[1] << ",3), ";

@@ -40,15 +40,15 @@ void paired2k::create_ad()
   double fk;
 #endif
 
-  cout << "paired2k::create_ad() with apx = " << bpars->apx << endl;
+  cout << "paired2k::create_ad() with apx = " << bpars->ap[0] << endl;
 
   //cout << "delta:\n";
   //write_m(delta, N);
 
-  if(bpars->apx) apx = .5;
+  if(bpars->ap[0]) apx = .5;
   else apx = .0;
 
-  if(bpars->apy) apy = .5;
+  if(bpars->ap[1]) apy = .5;
   else apy = .0;
 
   for(int j=0; j<N*N; j++) adx[j] = 0.;

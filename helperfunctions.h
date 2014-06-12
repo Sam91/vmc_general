@@ -62,5 +62,7 @@ void randomize();
 void test_diag(int,int);
 double bisect(double (*f)(double,double,double), double a, double b, double arg1, double arg2);
 
+int factorial(int);
+
 #endif
 

@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-  int req_args = 13;
+  int req_args = 14;
 
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << endl;
@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
 
   u1kagome* wf = new u1kagome( L, 3 );
 
-  wf->pars->apx = atoi(argv[2]); // P/AP boundary conditions
-  wf->pars->apy = atoi(argv[3]);
+  wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
+  wf->pars->ap[1] = atoi(argv[3]);
 
   wf->pars->e2 = atoi(argv[4])==1 ? true : false ; // unit cell doubling
   wf->pars->TR = atoi(argv[5])==1 ? true : false ; // rotation breaking (staggering of hopping in the hexagon)
@@ -69,9 +69,9 @@ int main(int argc, char *argv[])
     str = "c 3";
 
   if( wf->pars->e2 )
-    wf->pars->desc = string("U(1) Dirac: ").append(str);
+    wf->pars->desc = string("U(1) Dirac tst; ").append(str);
   else
-    wf->pars->desc = string("U(1) FS; ").append(str);
+    wf->pars->desc = string("U(1) FS tst; ").append(str);
 
   if(abs(wf->pars->xi[2])<1e-5 ) wf->pars->a[2]=0.;
 

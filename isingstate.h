@@ -1,5 +1,3 @@
-
-
 //The class isingstate contains a general ising state on a lattice
 
 #ifndef ISINGSTATE_H
@@ -7,13 +5,6 @@
 
 using namespace std;
 
-/*#include <stdlib.h>
-#ifndef GET_RAND
-#define GET_RAND ( (double)rand()/((double)RAND_MAX + 1.0) ) // the standard c library in stdlib.h
-#endif
-
-#include "randoma.h"
-*/
 
 #include "helperfunctions.h"
 #include "lattice.h"
@@ -27,7 +18,7 @@ class isingstate
 public:
   //Linear system size L for LxL square lattice
   isingstate(int L); //trivial unit cell
-  isingstate(int L, int ucell); // non-trivial unit cell
+  //isingstate(int L, int ucell); // non-trivial unit cell
   isingstate();
 
   ~isingstate();
@@ -45,9 +36,6 @@ public:
 
   int* lconf;
 
-  //flavor number per site
-//  int na;
-
   int N; //N is the number of sites
 
   int* Na;
@@ -55,9 +43,14 @@ public:
   lattice* mylattice;
 
   void init(int);
-  void init(int, int);// version for the case of non-trivial unit cell size
+  //void init(int, int);// version for the case of non-trivial unit cell size
   int save(const std::string);
   int load(const std::string);
+
+  void iter(); //iterate to the next ising state
+  int getint(); //get the integer representation
+  void setfirst(); //set the lowest state (int rep)
+  bool islast(); //check if it is the last state
 };
 
 

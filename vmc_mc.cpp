@@ -31,7 +31,7 @@ void vmc::set_random_conf()
   //cout << "starting new set_random_conf...\n";
 
   /* Set a random configuration */
-  h1=L2-SPINS_UP-SPINS_DN;
+  h1=LD-SPINS_UP-SPINS_DN;
   s1=SPINS_UP;
   s2=SPINS_DN;
   //cout << " set random conf\n";
@@ -74,7 +74,7 @@ int vmc::find_random_conf()
   //cout << "starting new find_random_conf...\n";
 
   /* Try to get a non-vanishing configuration */
-  for(int n=0; n<L2; n++)
+  for(int n=0; n<LD; n++)
   {
     set_random_conf();
     thermalize();
@@ -123,7 +123,7 @@ void vmc::set_conf( int **c )
 /* experience shows that the system is equilibrated (wf^2 saturates) after roughly twice systemSize steps*/
 void vmc::thermalize()
 {
-  int nn = 4*L2;
+  int nn = 4*LD;
 //  cout << "thermalizing with " << nn << " steps\n";
   for(int i=0; i<nn; i++ )
     walk_one_step();
@@ -160,7 +160,7 @@ void vmc::run_a_walk()
   //cout << "running a vmc walk\n";
   STEPS_TOTAL = 0;
   ACCEPTED_MOVES = 0;
-  for( int i=0;i<4*L2;i++ ) walk_one_step();
+  for( int i=0;i<4*LD;i++ ) walk_one_step();
 
   //cout << "MC steps: " << STEPS_TOTAL << "\n";
 //  cout << "Accepted moves: " << ACCEPTED_MOVES << "/" << STEPS_TOTAL << "\n";
@@ -186,6 +186,7 @@ void vmc::run_a_walk()
 /* fraction of accepted MC moves */
 double vmc::ar() { return (double)ACCEPTED_MOVES / (double)STEPS_TOTAL; }
 
+//this function is depreciated; we do this now in wavefunction.cpp
 void vmc::walk_one_step()
 {
   STEPS_TOTAL++;
@@ -195,7 +196,7 @@ void vmc::walk_one_step()
   //fr = rg.Random();
   fr = GET_RAND;
 
-  ir = (int) (fr*L2);
+  ir = (int) (fr*LD);
 
   i1 = (int) (ir/L);                /* i1,j1 is the first point to exchange */
   j1 =       (ir%L);
@@ -221,7 +222,7 @@ void vmc::walk_one_step()
     }
 */
     //Randomy chose a second point (nonlocal updates)
-    ir = (int) (fr*L2);
+    ir = (int) (fr*LD);
     i2 = (int) (ir/L);			// i2,j2 is second point to exchange
     j2 =       (ir%L);
 

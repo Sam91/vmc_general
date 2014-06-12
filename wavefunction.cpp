@@ -4,22 +4,19 @@
 //for the moment, we stick with 2d lattices
 wavefunction::wavefunction(int l) : wavefunction( l, 1) {}
 
-wavefunction::wavefunction(int l, int q) //arguments: linear system size and sublatice size)
+wavefunction::wavefunction(int l, int q) //arguments: linear system size; sublatice is now a compilation parameter)
 {
   this->L = l;
-  this->Q = q;
+  this->Q = SUBL;
 
-  this->L2 = L*L; this->N = L2*Q;
+  this->LD = pow(L,DIM); this->N = LD*SUBL;
 
   cout << "WF: setting number of sites to " << N << "\n";
 
-  if( q <= 1 ) // checking if we have non-trivial unit cell 
-    alpha = new isingstate( L );
-  else
-    alpha  = new isingstate(L, q);
+  alpha = new isingstate( L );
 
   //the number of operators we want to average over
-//  this->NO = Q*Q*L2; //here, we save all correlators, but average over lattice translations
+//  this->NO = Q*Q*LD; //here, we save all correlators, but average over lattice translations
   NO = 3;
   //NO = 15;
 
@@ -102,6 +99,9 @@ void wavefunction::set_lattice(const string& s)
 
   if( s.compare("kagome")==0 )
     alpha->mylattice->set_kagome();
+
+  if( s.compare("chain")==0 )
+    alpha->mylattice->set_chain();
 
   //alpha->mylattice->adjacency( 0 );
 
@@ -201,6 +201,23 @@ void wavefunction::accumulate()
   for(int no=0; no<NO; no++) f0[no] += fj[no];
 }
 
+void wavefunction::accumulate_exact()
+{
+  getwf(); //get the (unnormalized) wavefunction for this configuration
+
+  if( abs(wf)<SMALL ) return;
+
+  double wf2 = pow(abs(wf),2);
+  norm += wf2;
+  for(int i=0; i<NO; i++) fj[i] = 0.;
+
+#include "measurement_nnn.cpp"
+
+//  cout << "fj: "; for(int no=0; no<NO; no++) cout << fj[no] << "; "; cout << "\n";
+
+  for(int no=0; no<NO; no++) f0[no] += wf2*fj[no];
+}
+
 void wavefunction::initiate_f( int n )
 {
   f = createdouble(n, NO);
@@ -224,7 +241,7 @@ void wavefunction::collect_data()
 {
   for(int no=0; no<NO; no++)
   {
-    f[run][no] = f0[no]/((double)(mc_length*L2));
+    f[run][no] = f0[no]/((double)(mc_length*LD));
     f0[no] = 0.;
 #if NP
     for(int p=0; p<NP; p++) {
@@ -313,6 +330,17 @@ void wavefunction::print_avgs()
   }
   cout << std::fixed << setprecision(5) << sigma[NO-1] << "};"<<endl;
 }
+
+void wavefunction::print_f0()
+{
+  cout<< "f0={";
+  for(int no=0; no<NO-1; no++) {
+    cout << std::fixed << setprecision(5) << f0[no] << ", ";
+  }
+  cout << std::fixed << setprecision(5) << f0[NO-1] << "};" << endl;
+  cout << "Norm: " << norm << endl;
+}
+
 
 /*
  * This basic implementation of the MC step function performs a simple exchange of flavors (swap).
@@ -830,5 +858,34 @@ complex<double> wavefunction::dogleg(int i1, int i2)
 */
 //  cout << "dogleg(i1,i2): l = " << l << endl;
   return exp( complex<double>(0., (double)l * (this->jl) ) );
+}
+
+// calculate the correlators exactly by goint throught the entire hilbert space
+void wavefunction::calculate_exact()
+{
+#if NS !=2
+  cout << "ERROR: not implemented\n";
+  return;
+#endif
+
+  int nstate=1;
+
+  norm = 0.;
+
+  alpha->setfirst();
+  //alpha->print();
+  accumulate_exact();
+  while( 1 )
+  {
+    alpha->iter();
+    nstate++;
+    //alpha->print();
+    accumulate_exact();
+    if( alpha->islast() ) break;
+  }
+  cout << "Number of states: " << nstate << endl;
+
+  for(int no=0; no<NO; no++) f0[no] /= (double)N*norm;
+  for(int no=0; no<NO; no++) average[no] = f0[no];
 }
 

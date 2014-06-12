@@ -1,9 +1,13 @@
-//define a general 2D bravais lattice
+//define a general D-dimensional bravais lattice
 
 #ifndef LATTICE_H
 #define LATTICE_H
 
+//number of sublattice sites
 #define SUBL 1
+
+//dimension of the lattice
+#define DIM 1
 
 #include <string>
 
@@ -11,13 +15,13 @@ class lattice
 {
 
 public:
-  lattice(int l, int q);
+  lattice(int l);
   ~lattice();
 
-  int j(int n, int m, int q);  //get the linear lattice position
+  int j(int* n, int q);  //get the linear lattice position
   
-  void getnq(int&, int&, int&, int);
-  void torus(int&, int&); //bringing back to torus coordinates using boundary conditions
+  void getnq(int*, int&, int);
+  void torus(int*); //bringing back to torus coordinates using boundary conditions
   //void torus();
 
 //  int nx, ny, q; //coordinates uniquely labelling a point in the lattice
@@ -40,16 +44,19 @@ public:
   void set_checkerboard();
   void set_kagome();
 
+  void set_chain();
+
   void adjacency(int);
   std::string get_desc();
 
 private:
   int L, Q;
-  int L2, N;
+  int LD, N;
 
   int nbr; //number of neighbors stored in the connectivity matrix
 
   std::string desc;
+  int *n1, *n2;
 };
 
 #endif

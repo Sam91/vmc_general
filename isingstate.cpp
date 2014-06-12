@@ -3,18 +3,18 @@
 #include "isingstate.h"
 
 //na : number of states per site
-//sys: linear size of the 2D bravais lattice
+//sys: linear size of the D-dimensional bravais lattice
 //q  : number of sites per sublattice
 isingstate::isingstate(int sys)
 {
   init(sys);
 }
 
+/*
 isingstate::isingstate(int sys, int ucell)
 {
   init(sys, ucell);
-}
-
+}*/
 
 isingstate::isingstate()
 {
@@ -30,31 +30,32 @@ isingstate::~isingstate()
   delete mylattice;
 }
 
+/*
 void isingstate::init( int l )
 {
-  this->N = l*l;
+  this->N = pow(l,DIM);
 
   cout << "Creating new Ising state with NS=" << NS << " and N=" << N << "\n";
 
   lconf = new int[N];
   Na = new int[NS];
 
-  mylattice = new lattice(l, 1);
+  mylattice = new lattice(l);
 
   randomize();
-}
+}*/
 
 //version which allows for unit call
-void isingstate::init( int l, int q )
+void isingstate::init( int l )
 {
-  this->N = l*l*q;
+  this->N = pow(l,DIM)*SUBL;
 
   cout << "Creating new Ising state with NS=" << NS << " and N=" << N << "\n";
 
   lconf = new int[N];
   Na = new int[NS];
 
-  mylattice = new lattice(l, q);
+  mylattice = new lattice(l);
 
   randomize();
 }
@@ -75,11 +76,11 @@ void isingstate::print()
   cout << "Na = ";
   for(int n=0; n<NS; n++) cout << Na[n] << ", ";
   cout << "\n";
-  cout << "conf:\n";
+  cout << "conf: [";
   for(int i=0; i<N; i++) {
       cout << lconf[i] << ", ";
   }
-  cout << "\n";
+  cout << "]\n";
 }
 
 bool isingstate::checkNa()
@@ -212,4 +213,51 @@ void isingstate::step()
   //cout << "Moving (" << i1/L << "," << i1%L << "), (" << i2/L << "," << i2%L << ")\n";
 }
 */
+
+//iterate to the next ising state in the N1=N2 subspace.
+//for the moment, this only works for two flavors
+//void isingstate::iter(int* ising, int n)
+void isingstate::iter()
+{
+  int z=0;
+  int i;
+  for(i=0; i<N; i++)
+  {
+    if( lconf[i]==0 ) z++;
+    if( i>0 && lconf[i]==0 && lconf[i-1]==1 ) break;
+  }
+  lconf[i]=1;
+  lconf[i-1]=0;
+  for(int j=0; j<z; j++) lconf[i-1-j]=0;
+  for(int j=0; j<i-z; j++) lconf[i-1-z-j]=1;
+}
+
+//get the integer representation of an ising configuration
+//int isingstate::getint(int* ising, int n)
+int isingstate::getint()
+{
+  int ret=0;
+  for(int i=0; i<N; i++)
+    ret += lconf[i]*pow(NS, i);
+  return ret;
+}
+
+//set the lowest state in the natural enumeration
+//this only works for two flavors
+void isingstate::setfirst()
+{
+  Na[0] = Na[1] = N/2;
+  for(int i=0; i<N; i++)
+    if(i<N/2) lconf[i] = 1;
+    else lconf[i] = 0;
+}
+
+bool isingstate::islast()
+{
+  for(int i=0; i<N/2; i++)
+    if( lconf[i]==1 ) return false;
+  for(int i=N/2; i<N; i++)
+    if( lconf[i]==0 ) return false;
+  return true;
+}
 

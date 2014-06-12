@@ -22,7 +22,8 @@ struct baseparameters
   int N; //Number of sites/factors in the local tensor product
 
   string desc; //an english description of the state
-  bool apx, apy; //boundary conditions
+
+  bool *ap; //spinon boundary conditions
 };
 
 class wavefunction
@@ -99,10 +100,14 @@ public:
   virtual void correct_cff(bool) =0; //corrects the wave function normalization by a factor
   void reset_run();
 
+  void calculate_exact();
+  void accumulate_exact();
+  void print_f0();
+
 protected:
   isingstate* alpha;
 
-  int L, Q, L2, N; //system size
+  int L, Q, LD, N; //system size
 
   int NO; //number of operator to calculate
 
@@ -132,7 +137,7 @@ protected:
 
   int* NF; //Flavor number, if this wf is chosen to be such an eigenstate
   double cff;
-
+  double norm;
 
 private:
   double **f, ***fd;

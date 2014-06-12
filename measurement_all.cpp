@@ -16,6 +16,8 @@
   }
   */
 
+  //this should be fixed to use linear indices directly
+
   int i1r, i2r;
   for (int l1=0; l1<Q; l1++){ // loop over first label within unit cell
     for (int l2=0; l2<Q; l2++){ // over second label

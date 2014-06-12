@@ -368,7 +368,7 @@ int u1hybrid::findmu( int nz ) //tries to find a mu[0] such that Nz = nz before 
   cout << "Entering findmu(" << nz << ");\n";
 
   NF[0] = nz;
-  for(int i=1; i<NS; i++) NF[i] = (L2-nz)/(NS-1);
+  for(int i=1; i<NS; i++) NF[i] = (N-nz)/(NS-1);
 
   double dm = .05; //delta mu
 
@@ -519,7 +519,7 @@ void u1hybrid::get_dwf()
 }
 
 //swap operator of two sites i1 and i2 (corresponding to virtual_replacement)
-//of ratio=True, we only return the ratio of the wf after the swap, without updating the current wf
+//If ratio=True, we only return the ratio of the wf after the swap, without updating the current wf
 #if WFC
 complex<double> u1hybrid::swap(int i1, int i2, bool ratio)
 {
@@ -541,6 +541,7 @@ double u1hybrid::swap(int i1, int i2, bool ratio)
     if( abs(wf)<SMALL )
     {
       if( ratio ) { cout << "ERROR: incorrect ratio for vanishing wf! (wf="<< wf << ")\n"; exit(-1);}
+
       cout << "vanishing wf prior to swap... calculating from scratch ["<< wf << "]\n";
 
       //swap in lconf
@@ -625,7 +626,8 @@ double u1hybrid::swap(int i1, int i2, bool ratio)
         }
       } else cout << "\n";
 */
-      if( abs(r)<SMALL ) {
+      if( abs(r)<SMALL )
+      {
         int c = alpha->lconf[i1]; alpha->lconf[i1] = alpha->lconf[i2]; alpha->lconf[i2] = c;
         //cout << "Intermediate zero; recalculating from scratch\n";
         getwf();
