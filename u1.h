@@ -25,7 +25,7 @@ struct parameters : public baseparameters
 class u1 : public wavefunction
 {
 public:
-  u1(int, int);
+  u1(int);
   ~u1();
 
   virtual void getwf();

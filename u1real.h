@@ -19,7 +19,7 @@ struct parameters : public baseparameters
 class u1real : public u1hybrid
 {
 public:
-  u1real(int, int);
+  u1real(int);
   ~u1real();
 
   virtual void print();

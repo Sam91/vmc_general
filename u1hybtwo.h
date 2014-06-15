@@ -23,7 +23,7 @@ struct parameters : public baseparameters
 class u1hybtwo : public u1hybrid
 {
 public:
-  u1hybtwo(int, int);
+  u1hybtwo(int);
   ~u1hybtwo();
 
   virtual void print();

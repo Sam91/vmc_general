@@ -4,7 +4,7 @@
 
 //define a hybridized unpaired fermionic state on a general lattice for NS flavors.
 
-u1hybtwo::u1hybtwo(int n, int l) : u1hybrid( n, l )
+u1hybtwo::u1hybtwo(int l) : u1hybrid( l )
 {
   pars = new parameters;
   bpars = pars;

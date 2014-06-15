@@ -31,7 +31,7 @@ struct parameters : public baseparameters
 class u1kagome : public u1hybrid
 {
 public:
-  u1kagome(int, int);
+  u1kagome(int);
   ~u1kagome();
 
   virtual void print();

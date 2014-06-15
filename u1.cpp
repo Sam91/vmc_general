@@ -3,7 +3,7 @@
 
 //define a determinental U(1) state on any lattice for NS flavors (wf is a product of NS determinants).
 
-u1::u1(int n, int l) : wavefunction( n, l )
+u1::u1(int l) : wavefunction( l )
 {
   
   if(N%NS != 0) {

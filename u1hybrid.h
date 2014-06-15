@@ -12,7 +12,7 @@
 class u1hybrid : public wavefunction
 {
 public:
-  u1hybrid(int, int);
+  u1hybrid(int);
   ~u1hybrid();
 
   virtual void getwf();

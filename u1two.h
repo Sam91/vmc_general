@@ -23,7 +23,7 @@ struct parameters : public baseparameters
 class u1two : public twoflavor
 {
 public:
-  u1two(int, int);
+  u1two(int);
   ~u1two();
 
   virtual void print();

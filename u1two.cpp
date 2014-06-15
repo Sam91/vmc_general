@@ -3,7 +3,7 @@
 
 //define a determinental U(1) state for TWO flavors with equal filling (wf is a single determinant).
 
-u1two::u1two(int n, int l) : twoflavor( n, l )
+u1two::u1two(int l) : twoflavor( l )
 {
   if(NS!=2) {
     cout << "Must be compiled with NS=2\n";

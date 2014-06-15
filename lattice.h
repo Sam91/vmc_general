@@ -3,11 +3,11 @@
 #ifndef LATTICE_H
 #define LATTICE_H
 
-//number of sublattice sites
-#define SUBL 1
-
 //dimension of the lattice
 #define DIM 1
+
+//number of sublattice sites
+#define SUBL 1
 
 #include <string>
 

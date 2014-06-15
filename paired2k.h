@@ -6,7 +6,7 @@
 class paired2k : public twoflavor
 {
 public:
-  paired2k(int, int);
+  paired2k(int);
   ~paired2k();
 
   virtual void create_ad();

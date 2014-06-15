@@ -4,7 +4,7 @@
 
 //define a general hybridized unpaired state on any lattice for NS flavors of fermions.
 
-u1hybrid::u1hybrid(int n, int l) : wavefunction( n, l )
+u1hybrid::u1hybrid(int l) : wavefunction( l )
 {
   if( N%NS != 0 ) {
     cout << "N (number of sites " << N << ") must be a multiple of " << NS << "\n";

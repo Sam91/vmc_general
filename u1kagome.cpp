@@ -4,7 +4,7 @@
 // Define an unpaired real fermionic state on the Kagome lattice with first, second, and diagonal neighbor hopping
 // The state may have unit-vell doubling (epsilon) and an additional rotation staggering of the hopping real (tau_R)
 
-u1kagome::u1kagome(int l, int q) : u1hybrid( l, q )
+u1kagome::u1kagome(int l) : u1hybrid( l )
 {
   pars = new parameters;
   bpars = pars;

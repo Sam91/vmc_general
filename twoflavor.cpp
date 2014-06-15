@@ -8,7 +8,7 @@
  *
  */
 
-twoflavor::twoflavor(int l, int q) : wavefunction( l, q )
+twoflavor::twoflavor(int l) : wavefunction( l )
 {
   if(NS != 2) {
     cout << "ERROR: we can only do two flavors with this wave function\n";

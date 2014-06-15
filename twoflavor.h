@@ -13,7 +13,7 @@
 class twoflavor : public wavefunction
 {
 public:
-  twoflavor(int, int);
+  twoflavor(int);
   ~twoflavor();
 
   virtual void getwf();

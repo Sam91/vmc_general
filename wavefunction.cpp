@@ -1,10 +1,8 @@
 #include "wavefunction.h"
 #include <iomanip>
 
-//for the moment, we stick with 2d lattices
-wavefunction::wavefunction(int l) : wavefunction( l, 1) {}
-
-wavefunction::wavefunction(int l, int q) //arguments: linear system size; sublatice is now a compilation parameter)
+//argument: linear system size (DIM and SUBL are now compilation parameters)
+wavefunction::wavefunction( int l ) 
 {
   this->L = l;
   this->Q = SUBL;
@@ -17,7 +15,9 @@ wavefunction::wavefunction(int l, int q) //arguments: linear system size; sublat
 
   //the number of operators we want to average over
 //  this->NO = Q*Q*LD; //here, we save all correlators, but average over lattice translations
-  NO = 3;
+
+  NO = N-1; //all correlators on chain
+  //NO = 3;
   //NO = 15;
 
   f0 = new double[NO];
@@ -196,7 +196,7 @@ void wavefunction::accumulate()
  *
  */
 
-#include "measurement_nnn.cpp"
+#include "measurement_all_chain.cpp"
 
   for(int no=0; no<NO; no++) f0[no] += fj[no];
 }
@@ -211,7 +211,7 @@ void wavefunction::accumulate_exact()
   norm += wf2;
   for(int i=0; i<NO; i++) fj[i] = 0.;
 
-#include "measurement_nnn.cpp"
+#include "measurement_all_chain.cpp"
 
 //  cout << "fj: "; for(int no=0; no<NO; no++) cout << fj[no] << "; "; cout << "\n";
 
