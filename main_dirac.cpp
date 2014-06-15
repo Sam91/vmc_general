@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
 
-  u1dirac* wf = new u1dirac( L, 3 );
+  u1dirac* wf = new u1dirac( L );
 
   wf->pars->apx = atoi(argv[2]);
   wf->pars->apy = atoi(argv[3]);

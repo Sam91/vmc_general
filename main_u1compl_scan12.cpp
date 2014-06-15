@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
 
-  u1kagome* wf = new u1kagome( L, 3 );
+  u1kagome* wf = new u1kagome( L );
 
   wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
   wf->pars->ap[1] = atoi(argv[3]);

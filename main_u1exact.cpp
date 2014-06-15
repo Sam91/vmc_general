@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
 
-  u1real* wf = new u1real( L, 1 );
-  //u1kagome* wf = new u1kagome( L, 1 );
+  u1real* wf = new u1real( L );
+  //u1kagome* wf = new u1kagome( L );
 
   wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
   //wf->pars->apy = atoi(argv[3]);
