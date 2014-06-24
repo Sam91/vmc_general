@@ -31,7 +31,6 @@ cd $HOME/vmc_general/q_scripts
 #   $PBS_O_WORKDIR.
 #
 
-HOME=/home/bieri
 export LD_LIBRARY_PATH=/opt/openmpi/lib:$HOME/vmc_general/lib
 
 echo " "
@@ -40,7 +39,8 @@ echo "Job started on `hostname` at `date`"
 echo " "
 
 #./main_u1hyb 12 48 100 20 50 300 40 20
-$HOME/vmc_general/prod/executable AA AB AC AD AE AF AG AH AI AJ AK AL AM AN AO AP
+#$HOME/vmc_general/prod/executable AA AB AC AD AE AF AG AH AI AJ AK AL AM AN AO AP
+$HOME/vmc_general/prod/<cmd>
 
 echo " "
 echo " "
