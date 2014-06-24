@@ -1,24 +1,27 @@
 #include <iostream>
 #include <iomanip>
-
-//#include "u1real.h"
+#include <sys/types.h>
+#include <unistd.h>
 #include "u1kagome.h"
+
+// This is meant to be compiled with WFC=1
 
 int main(int argc, char *argv[])
 {
-  int req_args = 11;
+  int req_args = 14;
 
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << endl;
 
-  if(argc-1!=req_args) {
+  cout << "PID: " << getpid() << endl;
+
+  if(argc-1<req_args) {
     cout << "Error: incorrect number of arguments\n";
     exit(-1);
   }
 
   int L = atoi(argv[1]);
 
-  //u1real* wf = new u1real( L );
   u1kagome* wf = new u1kagome( L );
 
   wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
@@ -34,12 +37,12 @@ int main(int argc, char *argv[])
   wf->pars->xi[1] = ((double)atoi(argv[ 9]))/100.;
   wf->pars->xi[2] = ((double)atoi(argv[10]))/100.;
 
-  //wf->set_lattice( "chain" );
-  wf->set_lattice( "kagome" );
-  wf->set_hoppingk( 0. );
-  wf->set_mc_length( 80 );
+  wf->pars->a[0] = ((double)atoi(argv[11]))/600.; //phase of hopping in units of Pi
+  wf->pars->a[1] = ((double)atoi(argv[12]))/600.; 
+  wf->pars->a[2] = ((double)atoi(argv[13]))/600.; 
 
-  //wf->pars->desc = "U(1) chain"; 
+  wf->set_lattice( "kagome" );
+  wf->set_mc_length( 80 );
 
   string str;
   if( wf->pars->TR )
@@ -48,9 +51,16 @@ int main(int argc, char *argv[])
     str = "c 3";
 
   if( wf->pars->e2 )
-    wf->pars->desc = string("U(1) Dirac r; ").append(str);
+    wf->pars->desc = string("U(1) Dirac; ").append(str);
   else
-    wf->pars->desc = string("U(1) FS r; ").append(str);
+    wf->pars->desc = string("U(1) FS; ").append(str);
+
+  if(abs(wf->pars->xi[0])<1e-5 ) wf->pars->a[0]=0.;
+  if(abs(wf->pars->xi[1])<1e-5 ) wf->pars->a[1]=0.;
+  if(abs(wf->pars->xi[2])<1e-5 ) wf->pars->a[2]=0.;
+
+  wf->print();
+  wf->set_hoppingk( 0. );
 
   if( search_mu )
     if( wf->findmu()==-1 ) {
@@ -58,16 +68,13 @@ int main(int argc, char *argv[])
       exit(-1);
     }
 
-  wf->print();
-
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
 
-  myvmc->initialize( atoi(argv[11]) ); //number of bins to average over
+  myvmc->initialize( atoi(argv[14]) ); //number of bins to average over
   myvmc->run();
   myvmc->calculate_statistics();
   wf->insert_db();
-
   delete myvmc;
 
   delete wf;
