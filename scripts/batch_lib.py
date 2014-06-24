@@ -7,16 +7,20 @@ import time
 import smtplib
 from email.mime.text import MIMEText
 
-servers = {'phenix','vega','cypher','christopher','maggott','fifi'}
+#servers = {'mimic','iceberg','gambit','tornade','cypher','bishop','rovni','trasses','droopy','yumi','domino','philos', 'deb', 'ghast', 'phenix','lockheed','maggott','fifi','cavallieri','marrow'}
 
-all_servers = {'cyclope','thorgal','ghast','lockheed','christopher','mimic','dora','marrow','tapir','vega','beryl','cavallieri','wilbur','ember','colossus','yumi','pyro','bosons','trasses','callisto','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine','deb','polaris'}
+servers = {'ghast','lockheed','mimic','marrow','tapir','vega','beryl','cavallieri','ember','colossus','yumi','pyro','bosons','trasses','callisto','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine','deb','polaris'}
 
-#taking out haurele since Talbot is rebooting it
-#taking out elektra for Frederic
+#taking out 'christopher' because it is slow
+#taking out 'haurele' since Talbot is rebooting it
+#taking out 'elektra' for Frederic
 #issue with 'akira' and 'donald'
+#mimeto keeps rebooting
 #down: 'haurele', 'polaris'
 
-servers2 = {'cyclope','thorgal','elektra',}
+f256 = {'cyclope','dora','thorgal','wilbur'}
+
+servers2 = {'elektra'}
 
 #execute a command in the shell
 def rexec( cmd ):
@@ -34,7 +38,7 @@ def sshexc(server, cmd):
 def findservers():
 
   #fraction of CPUs to be used
-  r = 0.7
+  r = 0.8
 
   ntot = 0
   ctot = 0
@@ -54,7 +58,7 @@ def findservers():
     except:
       print out
       continue
-    nproc = int(sshexc(s, "ps -fe|grep -n 'bin/main_u1'|grep -v grep|wc -l"))
+    nproc = int(sshexc(s, "ps -fe|grep -n 'bin/main_u1'|grep -v grep|grep -v srun|wc -l"))
 
     #extract the idle percentage
     out = sshexc(s, "top -bn2 -d.2|grep 'Cpu(s)'|tail -1" ).replace('%',' ')
@@ -108,6 +112,72 @@ def gethost(nservers):
       return s
   print "No free host found..."
   return ''
+
+#submit a job via slurm
+def submit_slurmjob( job, cmd ):
+
+  fcmd = 'scripts/submit_slurm.sh '+ job +" '"+ cmd +"'"
+  out = rexec( fcmd )
+
+  return out
+
+def submit_slurm( tasklist ):
+
+  tasks = sorted( tasklist.keys() )
+
+  nsub = 0
+  waitingjob = 0
+
+  dt = time.strftime("%d/%m/%y %H:%M:%S")
+  print("Submitting tasks on "+ dt )
+  print("--------------------")
+
+  newtask=[]
+  for t in tasks:
+    cmd = tasklist[ t ][0]
+    srv = tasklist[ t ][1]
+
+    if len(srv) > 0:
+      continue
+    waitingjob = waitingjob + 1
+
+    out = submit_slurmjob( t, cmd )
+
+    #if len(host)<1:
+    #  break
+
+#    if pid==0:
+#      print("Warn: issue submitting to "+ host)
+#      continue
+    print out
+
+
+    tasklist[ t ][1] = out
+    #tasklist[ t ][2] = pid
+    tasklist[ t ][3] = 'running'
+    nsub = nsub+1
+    newtask.append( t )
+
+  #print tasklist
+  print "--------------------"
+  print "Submitted "+ str(nsub) +" jobs."
+  print "--------------------"
+
+#  if nsub==0 and waitingjob==0:
+#    print('All pending jobs are submitted!')
+#    sendmail('All jobs submitted', 'All pending jobs for this tasklist have been submitted as of '+ dt)
+
+  #save the updated servers list
+  #saveservers( nservers )
+
+  if len(newtask)<1:
+    newtask = None
+
+  #check the running tasks
+#  checktasks( tasklist, newtask )
+
+  return tasklist
+
 
 #submit a job to a server
 def submit_job( cmd, nservers ):
@@ -168,9 +238,10 @@ def submit( tasklist ):
     if len(srv) > 0:
       #print "Task '"+ t +"' has already been submitted to '"+ srv +"'."
       #if srv=='akira' or srv=='donald':
-      #  print("Exceptionally resubmitting "+ srv +" job")
-      #else:
-      continue
+      if srv=='mimeto':
+        print("Exceptionally resubmitting "+ srv +" job")
+      else:
+        continue
     waitingjob = waitingjob + 1
 
     [host, pid] = submit_job( cmd, nservers )
@@ -195,7 +266,7 @@ def submit( tasklist ):
 
   if nsub==0 and waitingjob==0:
     print('All pending jobs are submitted!')
-    sendmail('All jobs submitted', 'All pending jobs for this tasklist have been submitted as of '+ dt)
+    #sendmail('All jobs submitted', 'All pending jobs for this tasklist have been submitted as of '+ dt)
 
   #save the updated servers list
   saveservers( nservers )

@@ -3,13 +3,13 @@
 import sys
 from batch_lib import *
 
-taskfile = '/users/invites/sbieri/vmc_general/tasks_20.p'
-#taskfile = str(sys.argv[1])
+#taskfile = '/users/invites/sbieri/vmc_general/tasks_20.p'
+taskfile = str(sys.argv[1])
 
 #open tasklist
 tasklist = pickle.load( open(taskfile, "rb" ) )
 
-submit(tasklist)
+submit_slurm(tasklist)
 
 #save updated tasklist
 pickle.dump(tasklist, open(taskfile, "wb"))

@@ -1,0 +1,1 @@
+mysql -uuser -ppass -hhuebeli.mysql.db.hostpoint.ch -A huebeli_vmc

@@ -4,10 +4,8 @@
 #include <unistd.h>
 #include "u1kagome.h"
 
-//Here, we want to scan the ratios r1/r2 in a reasonable range
+//Here, we want to scan the ratios r1/r3 in a reasonable range
 // This is meant to be compiled with WFC=1
-
-
 
 int main(int argc, char *argv[])
 {
@@ -51,7 +49,7 @@ int main(int argc, char *argv[])
     exit( -1 );
   }
 
-  wf->pars->xi[2] = ((double)atoi(argv[10]))/100.; //xi3 is fixed
+  wf->pars->xi[2] = ((double)atoi(argv[10]))/100.; //xi2 is fixed
 
   wf->pars->a[0] = ((double)atoi(argv[11]))/600.; //phase of hopping in units of Pi
   wf->pars->a[1] = ((double)atoi(argv[12]))/600.; 
@@ -59,10 +57,10 @@ int main(int argc, char *argv[])
 
   int r0=1;
   if( sgn == -1 ) {
-    cout << "Scanning with xi2 = " << -2 << " ... -" << rtot << "." << endl;
+    cout << "Scanning with xi3 = " << -2 << " ... -" << rtot << "." << endl;
     r0 = 2;
   } else { //start x2 at 2 for now
-    cout << "Scanning with xi2 = " << 2 << " ... " << rtot << "." << endl;
+    cout << "Scanning with xi3 = " << 2 << " ... " << rtot << "." << endl;
     r0 = 2;
   }
 
@@ -80,15 +78,15 @@ int main(int argc, char *argv[])
   else
     wf->pars->desc = string("U(1) FS; ").append(str);
 
-  if(abs(wf->pars->xi[2])<1e-5 ) wf->pars->a[2]=0.;
 
   for( int r=r0; r <= rtot; r += 2 )
   {
     wf->pars->xi[0] = (double)(rtot-r)/100.;
-    wf->pars->xi[1] = (double)(sgn*r)/100.;
+    wf->pars->xi[2] = (double)(sgn*r)/100.;
 
     if(abs(wf->pars->xi[0])<1e-5 ) wf->pars->a[0]=0.;
     if(abs(wf->pars->xi[1])<1e-5 ) wf->pars->a[1]=0.;
+    if(abs(wf->pars->xi[2])<1e-5 ) wf->pars->a[2]=0.;
 
     wf->print();
     wf->set_hoppingk( 0. );
