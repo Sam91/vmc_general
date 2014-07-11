@@ -73,6 +73,13 @@ int lattice::j(int* n, int q)
     return n[0] + n[1]*L;
 #endif
 
+#elif DIM == 3
+#if SUBL>1
+    return SUBL*(n[0] + n[1]*L + n[2]*L*L) + q;
+#else
+    return n[0] + n[1]*L + n[2]*L*L;
+#endif
+
 #else
   cout << "ERROR: Undefined dimension\n";
   exit(-1);

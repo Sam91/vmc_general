@@ -2,7 +2,7 @@
 
 //define a Huse-Elser wave function for two flavors
 
-he_two::he_two(int n, int l) : huseelser( n, l )
+he_two::he_two(int n) : huseelser( n )
 {
   pars = new parameters;
   bpars = pars;
@@ -21,7 +21,8 @@ void he_two::print()
   cout << "wf pars->\n";
   cout << " j1, j2 = " << js[0] << ", " << js[1] << "\n";
   cout << " d[n][i] =\n";
-  for(int i=0; i<N; i++) {
+  for(int i=0; i<N; i++)
+  {
     cout << "   [" << d[0][i] << ", " << d[1][i] << ", " << d[2][i] << "]\n";
   }
 }
@@ -30,6 +31,14 @@ void he_two::print()
 void he_two::set_spiral(double phi1, double phi2)
 {
   cout << "he_two::set_spiral(" << phi1 << ", " << phi2 << ")\n";
+
+  //this only works without sublattice
+  if( Q>1 )
+  {
+    cout << "ERROR: cannot use this function if Q>1\n";
+    exit(-1);
+  }
+
   pars->phi1 = phi1;
   pars->phi2 = phi2;
   pars->desc = "he-spiral";
@@ -59,6 +68,12 @@ void he_two::set_spiral(double phi1, double phi2)
 void he_two::set_four(double phi1, double phi2)
 #if WFC
 {
+  //this only works without sublattice
+  if( Q>1 )
+  {
+    cout << "ERROR: cannot use this function if Q>1\n";
+    exit(-1);
+  }
 
   if( (L%2)!=0 )
   {
@@ -116,6 +131,76 @@ void he_two::set_four(double phi1, double phi2)
 }
 #endif
 
+//Set the q=0 state on the kagome lattice
+void he_two::set_q0()
+{
+  if( Q!=3 )
+  {
+    cout << "ERROR: we need Q=3 and a Kagome lattice to use he_two::set_q0()\n";
+    exit(-1);
+  }
+
+  cout << "he_two::set_q0()\n";
+
+#if WFC
+  pars->desc = "he-q0";
+#else
+  pars->desc = "he-q0-r";
+#endif
+
+  double cp, sp;
+
+  for(int j=0; j<N; j++)
+  {
+    switch( j%3 )
+    {
+      case 0: //A
+        cp = 1.;
+        sp = 0.;
+        break;
+      case 1: //B
+        cp = cos(tPi/6.);
+        sp = sin(tPi/6.);
+        break;
+      case 2: //C
+        cp = cos(tPi/3.);
+        sp = sin(tPi/3.);
+        break;
+    }
+
+#if WFC
+    d[0][j] = complex<double>(cp,sp); //x-y plane
+    d[1][j] = complex<double>(cp,-sp);
+#else
+    d[0][j] = cp + sp; //x-z plane
+    d[1][j] = -cp + sp;
+#endif
+  }
+}
+
+int he_two::insert_db()
+{
+  mysql_wrapper* wrapper = new mysql_wrapper();
+
+  std::ostringstream os;
+
+  os << "INSERT INTO liquid (id, sites, lattice, txtdsc, NS, N0, mc_length, nbin, ";
+  os << "xi1, xi2, xi3, ";
+  os << "P1, dP1, P2, dP2, P3, dP3 ) VALUES (";
+  os <<  "'', " << N << ", '" << alpha->mylattice->get_desc() << "', '" << pars->desc << "', " << NS << ", " << NF[0] << ", " << mc_length << ", " << nk << ", ";
+  os << "round(" << js[0] << ",3), round(" << js[1] << ",3), round(" << js[2] << ",3), ";
+
+  os << average[0] << ", " << sigma[0] << ", " << average[1] << ", " << sigma[1] << ", " << average[2] << ", " << sigma[2];
+  os << ")";
+
+  int res = wrapper->insert_qry( os.str() );
+
+  delete wrapper;
+
+  return res;
+}
+
+/*
 int he_two::insert_db()
 {
   mysql_wrapper* wrapper = new mysql_wrapper();
@@ -138,6 +223,7 @@ int he_two::insert_db()
 
   return res;
 }
+*/
 
 //overwrite the default jastrow factors for the anisotropic triangular lattice
 

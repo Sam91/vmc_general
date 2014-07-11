@@ -245,6 +245,7 @@ void u1kagome::set_hopping3(double *tt1, double *tt2)
 
 void u1kagome::print() {}
 
+/*
 void u1kagome::print_avgs()
 {
   cout<< "ff={";
@@ -258,6 +259,7 @@ void u1kagome::print_avgs()
   }
   cout << std::fixed << setprecision(5) << sigma[NO-1] << "};"<<endl;
 }
+*/
 
 int u1kagome::insert_db()
 {

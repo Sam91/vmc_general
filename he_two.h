@@ -12,11 +12,13 @@ struct parameters : public baseparameters
 class he_two : public huseelser
 {
 public:
-  he_two(int, int);
+  he_two(int);
   ~he_two();
 
   void set_spiral(double, double); //spiral state
   void set_four(double, double); //four sublattice distortion of 120' state
+
+  void set_q0(); //set the q=0 on the kagome
 
   parameters* pars;
 

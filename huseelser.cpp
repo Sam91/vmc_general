@@ -2,11 +2,11 @@
 
 //abstract Huse-Else wave function
 
-huseelser::huseelser(int n, int l) : wavefunction( n, l )
+huseelser::huseelser( int l ) : wavefunction( l )
 {
   //create the d vectors (defining the product state)
 #if WFC
-  d = createcomplex(NS, N);
+  d = createcomplex(NS, N); // N is the number of sites
 #else
   d = createdouble(NS, N);
 #endif
@@ -52,14 +52,17 @@ void huseelser::getwf()
   {
     wf *= d[ alpha->lconf[i1] ][i1];
   }
+
+/*
 #if WFC
   wf *= (jastrow3()*dogleg()*cff);
 #else
   wf *= (jastrow3()*cff);
 #endif
-  //wf *= (jastrow()*cff);
+*/
+  wf *= (jastrow()*cff);
 
-  cout << "huseelser::getwf(): " << std::scientific << wf << "\n";
+  //cout << "huseelser::getwf(): " << std::scientific << wf << "\n";
 }
 
 //swap states on two sites i1 and i2 (corresponding to virtual_replacement)
@@ -83,14 +86,17 @@ double huseelser::swap(int i1, int i2, bool ratio)
   {
     if( abs( d[ alpha->lconf[i1] ][i1])>SMALL && abs(d[ alpha->lconf[i2] ][i2])>SMALL )
     {
+/*
 #if WFC
       r = (d[ alpha->lconf[i2] ][i1]*d[ alpha->lconf[i1] ][i2])/(d[ alpha->lconf[i1] ][i1]*d[ alpha->lconf[i2] ][i2]) * jastrow3(i1, i2) * dogleg(i1, i2);
 #else
       r = (d[ alpha->lconf[i2] ][i1]*d[ alpha->lconf[i1] ][i2])/(d[ alpha->lconf[i1] ][i1]*d[ alpha->lconf[i2] ][i2]) * jastrow3(i1, i2);
 #endif //WFC
-      //r = (d[ alpha->lconf[i2] ][i1]*d[ alpha->lconf[i1] ][i2])/(d[ alpha->lconf[i1] ][i1]*d[ alpha->lconf[i2] ][i2]) * jastrow(i1, i2);
-    } 
-    else {
+*/
+      r = (d[ alpha->lconf[i2] ][i1]*d[ alpha->lconf[i1] ][i2])/(d[ alpha->lconf[i1] ][i1]*d[ alpha->lconf[i2] ][i2]) * jastrow(i1, i2);
+      //r = (d[ alpha->lconf[i2] ][i1]*d[ alpha->lconf[i1] ][i2])/(d[ alpha->lconf[i1] ][i1]*d[ alpha->lconf[i2] ][i2]);
+
+    } else {
       cout << "Hitting node swap\n";
       r = 1.;
     }
@@ -148,9 +154,9 @@ void huseelser::correct_cff(bool s)
   double r;
 
   if( s )
-    r = 1e10;
+    r = pow(1.1,N);
   else
-    r = 1e-10;
+    r = pow(.9,N);
 
   normalize( r );
   //cout << "TF: cff changed to " << cff[n_ext] << endl;

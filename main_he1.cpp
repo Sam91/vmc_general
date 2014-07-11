@@ -18,14 +18,16 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
   
-  he_two* wf = new he_two( L*L, L );
+  he_two* wf = new he_two( L*L );
 
   //wf->set_lattice( "square" );
   //wf->set_lattice( "checkerboard" );
-  wf->set_lattice( "triangular" );
+  //wf->set_lattice( "triangular" );
+  wf->set_lattice( "kagome" );
 
   //wf->set_four( (double)atoi(argv[5])/(double)atoi(argv[6]), (double)atoi(argv[7])/(double)atoi(argv[8]) );
-  wf->set_spiral( (double)atoi(argv[2])/(double)atoi(argv[3]), (double)atoi(argv[4])/(double)atoi(argv[5]) );
+  //wf->set_spiral( (double)atoi(argv[2])/(double)atoi(argv[3]), (double)atoi(argv[4])/(double)atoi(argv[5]) );
+  wf->set_q0();
 
   //wf->print_d();
 

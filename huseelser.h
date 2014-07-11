@@ -6,7 +6,7 @@
 class huseelser : public wavefunction
 {
 public:
-  huseelser(int, int);
+  huseelser(int);
   ~huseelser();
 
   virtual void getwf();

@@ -323,12 +323,12 @@ void wavefunction::print_avgs()
 {
   cout<< "ff={";
   for(int no=0; no<NO-1; no++) {
-    cout << std::fixed << setprecision(5) << average[no] << " pm " << sigma[no] << "\n";
+    cout << std::fixed << setprecision(5) << average[no] << ", ";
   }
   cout << std::fixed << setprecision(5) << average[NO-1] << "};"<<endl;
   cout<< "ffsigma={";
-  for(int no=0; no<NO; no++) {
-    cout << std::fixed << setprecision(5) << average[no] << " pm " << sigma[no] << "\n";
+  for(int no=0; no<NO-1; no++) {
+    cout << std::fixed << setprecision(5) << sigma[no] << ", ";
   }
   cout << std::fixed << setprecision(5) << sigma[NO-1] << "};"<<endl;
 }
