@@ -25,7 +25,9 @@ int main(int argc, char *argv[])
   //wf->set_lattice( "triangular" );
   wf->set_lattice( "kagome" );
 
-  wf->set_q0();
+  //wf->set_q0();
+  wf->set_cbc1();
+  //wf->set_cbc2();
 
   //wf->print_d();
 
@@ -39,13 +41,14 @@ int main(int argc, char *argv[])
   wf->js[1] = atoi(argv[3])/100.; //j2
   wf->js[2] = atoi(argv[4])/100.; //j3
 
-  //myvmc->run();
-  //myvmc->calculate_statistics();
+  myvmc->run();
+  myvmc->calculate_statistics();
   //wf->insert_db();
 
   //wf->calculate_exact();
   //wf->print_f0();
 
+/*
   for(int n2=0; n2<30; n2++)
   {
       try
@@ -58,8 +61,7 @@ int main(int argc, char *argv[])
       }
       wf->js[0] += .02;
   }
-  //wf->js[0] += .05;
-  //wf->js[5] = wf->js[3] = wf->js[0];
+*/
   
   delete myvmc;
   delete wf;

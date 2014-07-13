@@ -35,6 +35,12 @@ all:
 	${GCC} -c -Wall -O3 -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
 	${GCC} -Wall -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 
+fast:
+	@echo "Main is: " ${MAIN}
+	rm -f main*.o
+	${GCC} -c -Wall -O0 -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
+	${GCC} -Wall -O0 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
+
 link:
 	${GCC} -g0 -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 

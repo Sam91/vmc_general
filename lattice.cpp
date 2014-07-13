@@ -131,7 +131,7 @@ void lattice::torus(int* n)
   }
 }
 
-//sets the connectivity and links matrices to a kagome (currently only nearest neighbor!)
+//sets the connectivity and links matrices to a kagome
 void lattice::set_kagome()
 {
   if( DIM != 2 )

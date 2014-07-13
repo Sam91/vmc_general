@@ -134,7 +134,7 @@ void he_two::set_four(double phi1, double phi2)
 //Set the q=0 state on the kagome lattice
 void he_two::set_q0()
 {
-  if( Q!=3 )
+  if( Q!=3 || DIM!=2 )
   {
     cout << "ERROR: we need Q=3 and a Kagome lattice to use he_two::set_q0()\n";
     exit(-1);
@@ -174,6 +174,238 @@ void he_two::set_q0()
 #else
     d[0][j] = cp + sp; //x-z plane
     d[1][j] = -cp + sp;
+#endif
+  }
+}
+
+//Set cuboc-1 state on kagome lattice
+void he_two::set_cbc1()
+{
+  if( Q!=3 || DIM!=2 || L%2==1 )
+  {
+    cout << "ERROR: we need Q=3 and a Kagome lattice for he_two::set_cbc()\n";
+    exit(-1);
+  }
+  cout << "he_two::set_cbc1()\n";
+
+#if WFC
+  pars->desc = "he-cbc1";
+#else
+  cout << "WARN: cannot set cuboc for real wf!\n";
+  pars->desc = "he-cbc1-r";
+#endif
+
+  int q, j1, j2;
+  double phi, theta;
+  double v1=0.;
+  double v2=0.;
+  double v3=0.;
+
+  for(int j=0; j<N; j++)
+  {
+    q = j % Q; j1 = (j/Q)%L; j2 = (j/Q)/L;
+
+    switch( q )
+    {
+      case 0:
+        if( j1%2 == 0 && j2%2 == 0)
+        {
+          v1 = -1.; v2 = 1.; v3 = 0.; //12
+        }
+
+        if( j1%2 == 1 && j2%2 == 0)
+        {
+          v1 = 1.; v2 = -1.; v3 = 0.; //9
+        }
+
+        if( j1%2 == 0 && j2%2 == 1)
+        {
+          v1 = -1.; v2 = -1.; v3 = 0.; //4
+        }
+
+        if( j1%2 == 1 && j2%2 == 1)
+        {
+          v1 = 1.; v2 = 1.; v3 = 0.; //1
+        }
+        break;
+
+      case 1:
+        if( j1%2 == 0 && j2%2 == 0)
+        {
+          v1 = 1.; v2 = 0.; v3 = -1.; //5
+        }
+
+        if( j1%2 == 1 && j2%2 == 0)
+        {
+          v1 = -1.; v2 = 0.; v3 = -1.; //7
+        }
+
+        if( j1%2 == 0 && j2%2 == 1)
+        {
+          v1 = 1.; v2 = 0.; v3 = 1.; //10
+        }
+
+        if( j1%2 == 1 && j2%2 == 1)
+        {
+          v1 = -1.; v2 = 0.; v3 = 1.; //2
+        }
+        break;
+
+      case 2:
+        if( j1%2 == 0 && j2%2 == 0)
+        {
+          v1 = 0.; v2 = 1.; v3 = 1.; //11
+        }
+
+        if( j1%2 == 1 && j2%2 == 0)
+        {
+          v1 = 0.; v2 = -1.; v3 = 1.; //6
+        }
+
+        if( j1%2 == 0 && j2%2 == 1)
+        {
+          v1 = 0.; v2 = -1.; v3 = -1.; //8
+        }
+
+        if( j1%2 == 1 && j2%2 == 1)
+        {
+          v1 = 0.; v2 = 1.; v3 = -1.; //3
+        }
+        break;
+
+      default:
+        v1 = 0.; v2 = 0.; v3 = 0.;
+        cout << "WARN: set_cbc1() error\n";
+    }
+
+    phi = atan2( v2, v1 );
+    theta = acos( v3/sqrt(v1*v1+v2*v2+v3*v3) );
+
+    cout << "(" << j1 << ", " << j2 << "); " << q << ": ";
+    cout << "phi= "<< phi/M_PI << "; theta= " << theta/M_PI << ". S = ("<< sin(theta)*cos(phi) << ", " << sin(theta)*sin(phi) << ", " << cos(theta) << ")\n";
+
+#if WFC
+    d[0][j] = complex<double>(cos(phi/2.),  sin(phi/2.))*cos(theta/2.);
+    d[1][j] = complex<double>(cos(phi/2.), -sin(phi/2.))*sin(theta/2.);
+#else
+    d[0][j] = cos(phi/2.)*cos(theta/2.);
+    d[0][j] = cos(phi/2.)*sin(theta/2.);
+#endif
+  }
+}
+
+//Set cuboc-2 state on kagome lattice
+void he_two::set_cbc2()
+{
+  if( Q!=3 || DIM!=2 || L%2==1 )
+  {
+    cout << "ERROR: we need Q=3 and a Kagome lattice for he_two::set_cbc2()\n";
+    exit(-1);
+  }
+  cout << "he_two::set_cbc2()\n";
+
+#if WFC
+  pars->desc = "he-cbc2";
+#else
+  pars->desc = "he-cbc2-r";
+  cout << "WARN: cannot set cuboc for real wf!\n";
+#endif
+
+  int q, j1, j2;
+  double phi, theta;
+  double v1=0.;
+  double v2=0.;
+  double v3=0.;
+
+  for(int j=0; j<N; j++)
+  {
+    q = j % Q; j1 = (j/Q)%L; j2 = (j/Q)/L;
+
+    switch( q )
+    {
+      case 0:
+        if( j1%2 == 0 && j2%2 == 0)
+        {
+          v1 = -1.; v2 = 1.; v3 = 0.; //12
+        }
+
+        if( j1%2 == 1 && j2%2 == 0)
+        {
+          v1 = 1.; v2 = -1.; v3 = 0.; //9
+        }
+
+        if( j1%2 == 0 && j2%2 == 1)
+        {
+          v1 = -1.; v2 = -1.; v3 = 0.; //4
+        }
+
+        if( j1%2 == 1 && j2%2 == 1)
+        {
+          v1 = 1.; v2 = 1.; v3 = 0.; //1
+        }
+        break;
+
+      case 1:
+        if( j1%2 == 0 && j2%2 == 0)
+        {
+          v1 = -1.; v2 = 0.; v3 = -1.; //5
+        }
+
+        if( j1%2 == 1 && j2%2 == 0)
+        {
+          v1 = 1.; v2 = 0.; v3 = -1.; //7
+        }
+
+        if( j1%2 == 0 && j2%2 == 1)
+        {
+          v1 = -1.; v2 = 0.; v3 = 1.; //10
+        }
+
+        if( j1%2 == 1 && j2%2 == 1)
+        {
+          v1 = 1.; v2 = 0.; v3 = 1.; //2
+        }
+        break;
+
+      case 2:
+        if( j1%2 == 0 && j2%2 == 0)
+        {
+          v1 = 0.; v2 = -1.; v3 = -1.; //11
+        }
+
+        if( j1%2 == 1 && j2%2 == 0)
+        {
+          v1 = 0.; v2 = 1.; v3 = -1.; //6
+        }
+
+        if( j1%2 == 0 && j2%2 == 1)
+        {
+          v1 = 0.; v2 = 1.; v3 = 1.; //8
+        }
+
+        if( j1%2 == 1 && j2%2 == 1)
+        {
+          v1 = 0.; v2 = -1.; v3 = 1.; //3
+        }
+        break;
+
+      default:
+        v1 = 0.; v2 = 0.; v3 = 0.;
+        cout << "WARN: set_cbc2() error\n";
+    }
+
+    phi = atan2( v2, v1 );
+    theta = acos( v3/sqrt(v1*v1+v2*v2+v3*v3) );
+
+    cout << "(" << j1 << ", " << j2 << "); " << q << ": ";
+    cout << "phi= "<< phi/M_PI << "; theta= " << theta/M_PI << ". S = ("<< sin(theta)*cos(phi) << ", " << sin(theta)*sin(phi) << ", " << cos(theta) << ")\n";
+
+#if WFC
+    d[0][j] = complex<double>(cos(phi/2.),  sin(phi/2.))*cos(theta/2.);
+    d[1][j] = complex<double>(cos(phi/2.), -sin(phi/2.))*sin(theta/2.);
+#else
+    d[0][j] = cos(phi/2.)*cos(theta/2.);
+    d[0][j] = cos(phi/2.)*sin(theta/2.);
 #endif
   }
 }
