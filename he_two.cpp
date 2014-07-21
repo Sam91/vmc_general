@@ -281,8 +281,8 @@ void he_two::set_cbc1()
     phi = atan2( v2, v1 );
     theta = acos( v3/sqrt(v1*v1+v2*v2+v3*v3) );
 
-    cout << "(" << j1 << ", " << j2 << "); " << q << ": ";
-    cout << "phi= "<< phi/M_PI << "; theta= " << theta/M_PI << ". S = ("<< sin(theta)*cos(phi) << ", " << sin(theta)*sin(phi) << ", " << cos(theta) << ")\n";
+    //cout << "(" << j1 << ", " << j2 << "); " << q << ": ";
+    //cout << "phi= "<< phi/M_PI << "; theta= " << theta/M_PI << ". S = ("<< sin(theta)*cos(phi) << ", " << sin(theta)*sin(phi) << ", " << cos(theta) << ")\n";
 
 #if WFC
     d[0][j] = complex<double>(cos(phi/2.),  sin(phi/2.))*cos(theta/2.);
@@ -397,8 +397,8 @@ void he_two::set_cbc2()
     phi = atan2( v2, v1 );
     theta = acos( v3/sqrt(v1*v1+v2*v2+v3*v3) );
 
-    cout << "(" << j1 << ", " << j2 << "); " << q << ": ";
-    cout << "phi= "<< phi/M_PI << "; theta= " << theta/M_PI << ". S = ("<< sin(theta)*cos(phi) << ", " << sin(theta)*sin(phi) << ", " << cos(theta) << ")\n";
+    //cout << "(" << j1 << ", " << j2 << "); " << q << ": ";
+    //cout << "phi= "<< phi/M_PI << "; theta= " << theta/M_PI << ". S = ("<< sin(theta)*cos(phi) << ", " << sin(theta)*sin(phi) << ", " << cos(theta) << ")\n";
 
 #if WFC
     d[0][j] = complex<double>(cos(phi/2.),  sin(phi/2.))*cos(theta/2.);

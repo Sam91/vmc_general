@@ -28,3 +28,5 @@ ss
 # compressed files
 *.tar
 
+# tasks files
+task*

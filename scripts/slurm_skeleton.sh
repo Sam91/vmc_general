@@ -1,12 +1,14 @@
 #!/bin/bash
 
 #SBATCH --job-name=<jobname>
-#SBATCH --output=$HOME/log/<jobname>.out
-#SBATCH --error=$HOME/log/<jobname>.err
+#SBATCH --output=/users/invites/sbieri/log/<jobname>.out
+#SBATCH --error=/users/invites/sbieri/log/<jobname>.err
 #SBATCH --ntasks=1
-#SBATCH --time=24:00:00
-#SBATCH --mem-per-cpu=10
+#SBATCH --time=01:00:00
+#SBATCH --mem-per-cpu=100
 #SBATCH --partition=normal
+#SBATCH --exclude=pyro,sarabi,elektra
+#SBATCH --export=LD_LIBRARY_PATH=/users/invites/sbieri/lib/
 
-srun nice -n 19 /users/invites/sbieri/vmc_general/bin/<cmd>
+srun nice -n 19 $HOME/vmc_general/bin/<cmd>
 

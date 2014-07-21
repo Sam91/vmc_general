@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
   int rtot = atoi(argv[ 8]); //total xi1 + |xi2|
   int r0   = atoi(argv[ 9]); // starting |xi2|
   int step = atoi(argv[10]); // stepsize for |xi2|
-  int sgn  = atoi(argv[11]);  //sign of xi2 to scan
+  int sgn  = atoi(argv[11])==0 ? 1 : -1 ;  //sign of xi2 to scan
+
   if( rtot<0 ) {
     cout << "ERROR: We need rmax > 0." << endl;
     exit( -1 );
@@ -64,9 +65,9 @@ int main(int argc, char *argv[])
 #endif
 
   if( sgn == -1 ) {
-    cout << "Scanning with xi2 = -" << r0 << " ... -" << rtot << "." << endl;
-  } else { //start x2 at 2 for now
-    cout << "Scanning with xi2 = " << r0 << " ... " << rtot << "." << endl;
+    cout << "Scanning with xi2 = -" << r0 << " ... -" << rtot << ", step " << step << "." << endl;
+  } else {
+    cout << "Scanning with xi2 = " << r0 << " ... -" << rtot << ", step " << step << "." << endl;
   }
 
   wf->set_lattice( "kagome" );
@@ -76,7 +77,11 @@ int main(int argc, char *argv[])
   if( wf->pars->TR )
     str = "c 12";
   else
+#if WFC
+    str = "c 3";
+#else
     str = "c 0";
+#endif
 
   if( wf->pars->e2 )
     wf->pars->desc = string("U(1) Dirac: ").append(str);
@@ -118,6 +123,5 @@ int main(int argc, char *argv[])
 
   delete wf;
   return 0;
-
 }
 

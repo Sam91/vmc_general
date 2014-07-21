@@ -9,7 +9,9 @@ from email.mime.text import MIMEText
 
 #servers = {'mimic','iceberg','gambit','tornade','cypher','bishop','rovni','trasses','droopy','yumi','domino','philos', 'deb', 'ghast', 'phenix','lockheed','maggott','fifi','cavallieri','marrow'}
 
-servers = {'ghast','lockheed','mimic','marrow','tapir','vega','beryl','cavallieri','ember','colossus','yumi','pyro','bosons','trasses','callisto','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine','deb','polaris'}
+#servers = {'ghast','lockheed','mimic','marrow','tapir','vega','beryl','cavallieri','ember','colossus','yumi','pyro','bosons','trasses','callisto','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine','deb','polaris'}
+
+servers = ['phenix','philos','maggott','iceberg','fifi','bishop','droopy','vega','clochette','choupette','christopher','bosons','polaris','magneto','professorx','solar','crush','trasses','forge','cypher']
 
 #taking out 'christopher' because it is slow
 #taking out 'haurele' since Talbot is rebooting it
@@ -58,7 +60,7 @@ def findservers():
     except:
       print out
       continue
-    nproc = int(sshexc(s, "ps -fe|grep -n 'bin/main_u1'|grep -v grep|grep -v srun|wc -l"))
+    nproc = int(sshexc(s, "ps -fe|grep -n 'bin/main_'|grep -v grep|grep -v srun|wc -l"))
 
     #extract the idle percentage
     out = sshexc(s, "top -bn2 -d.2|grep 'Cpu(s)'|tail -1" ).replace('%',' ')
@@ -72,7 +74,7 @@ def findservers():
     print s + " has " + str(ncpu) + " CPUs and "+ str(nproc) + " running processes, idle = "+ str(idle)
 
     if nproc==0 and (.8*idle/100.>1.-r):
-      print("Warn: No processes running on '"+ s +"'. You may check it")
+      print("==> Warn: No processes running on '"+ s +"'. You may check it")
 
     #calculate the number of jobs we want to sumbit to this server
     #theoretical maximum
@@ -136,8 +138,9 @@ def submit_slurm( tasklist ):
   for t in tasks:
     cmd = tasklist[ t ][0]
     srv = tasklist[ t ][1]
+    sts = tasklist[ t ][2]
 
-    if len(srv) > 0:
+    if sts == 0:
       continue
     waitingjob = waitingjob + 1
 
@@ -154,7 +157,8 @@ def submit_slurm( tasklist ):
 
     tasklist[ t ][1] = out
     #tasklist[ t ][2] = pid
-    tasklist[ t ][3] = 'running'
+    #tasklist[ t ][3] = 'running'
+    tasklist[ t ][2] = 'submitted'
     nsub = nsub+1
     newtask.append( t )
 
@@ -201,14 +205,14 @@ def submit_job( cmd, nservers ):
     return [host, pid]
 
 #method to sumbit a list of task to all servers
-def submit( tasklist ):
+def submit( task ):
 
-  tasks = sorted(tasklist.keys())
+  tasks = sorted(task.keys())
 
   #check if there is at least one job to submit
   no_new = True
   for t in tasks:
-    if len(tasklist[ t ][0])>0:
+    if task[t][2]=='new':
       no_new = False
       break
 
@@ -216,8 +220,8 @@ def submit( tasklist ):
     print("No job to submit.")
     print "--------------------"
 
-    checktasks( tasklist )
-    return tasklist
+    checktasks( task )
+    return task
 
   #make sure we have an updated server list
   nservers = findservers()
@@ -232,17 +236,26 @@ def submit( tasklist ):
 
   newtask=[]
   for t in tasks:
-    cmd = tasklist[ t ][0]
-    srv = tasklist[ t ][1]
 
-    if len(srv) > 0:
+    cmd = task[ t ][0] #command
+    srv = task[ t ][1] #server
+    sts = task[ t ][2] #status
+
+    if sts=='done' or sts=='submitted' or sts=='running':
       #print "Task '"+ t +"' has already been submitted to '"+ srv +"'."
       #if srv=='akira' or srv=='donald':
-      if srv=='mimeto':
-        print("Exceptionally resubmitting "+ srv +" job")
-      else:
+      #if srv=='mimeto':
+      #  print("Exceptionally resubmitting "+ srv +" job")
+      #else:
         continue
     waitingjob = waitingjob + 1
+
+    if sts=='unreachable':
+    #if sts=='unreachable' and len(srv)<1:
+      continue
+
+    #print "Submitting job in state '"+ str(sts) +"'"
+    print task[t]
 
     [host, pid] = submit_job( cmd, nservers )
 
@@ -253,9 +266,9 @@ def submit( tasklist ):
       print("Warn: issue submitting to "+ host)
       continue
 
-    tasklist[ t ][1] = host
-    tasklist[ t ][2] = pid
-    tasklist[ t ][3] = 'running'
+    task[ t ][1] = host
+    task[ t ][2] = 'running'
+    task[ t ][3] = pid
     nsub = nsub+1
     newtask.append( t )
 
@@ -275,53 +288,56 @@ def submit( tasklist ):
     newtask = None
 
   #check the running tasks
-  checktasks( tasklist, newtask )
+  checktasks( task, newtask )
 
-  return tasklist
+  return task
 
 #check the status of submitted tasks
-def checktasks( tasklist, newtask = None ):
+def checktasks( task, newtask = None ):
 
   done = 0
   running = 0
   notsub = 0
   unreachable = 0
-  allkeys = sorted(tasklist.keys())
+  allkeys = sorted(task.keys())
 
   tmsg = "Checking tasks on "+ time.strftime("%d/%m/%y %H:%M:%S")
   print( tmsg )
 
   for t in allkeys:
-    srv = tasklist[t][1]
+    srv = task[t][1]
     if len(srv)<1:
       notsub = notsub + 1
       continue
 
-    stat = tasklist[t][3]
-    if stat=='done':
+    stat = task[t][2]
+    if stat=='done' or stat=='submitted' or stat==0:
       done = done + 1
       continue
     if stat=='unreachable':
       unreachable = unreachable + 1
       continue
+    if len(srv)<1 or stat=='new':
+      continue
+
+    #check status for jobs marked as running
     if stat!='running':
       print("Warn: unknown state '"+ stat +"'")
       continue
 
-    #check status for jobs marked as running
-    pid = tasklist[t][2]
+    pid = task[t][3]
     r = isrunning(srv, pid)
     if r<0:
       print( "Server '"+ srv +"' unreachable.")
       unreachable = unreachable+1
-      tasklist[t][3] = 'unreachable'
+      task[t][2] = 'unreachable'
       continue
     if r==1:
       running = running + 1
     else:
       if r==0:
         done = done + 1
-        tasklist[t][3] = 'done'
+        task[t][2] = 'done'
         if newtask is not None:
           if t in newtask:
             print("Warn: New job was NOT found: "+ srv +"/"+ str(pid) )
@@ -344,14 +360,14 @@ def checktasks( tasklist, newtask = None ):
   if done+unreachable>n:
     sendmail('All jobs done!', 'Happy :)' )
 
-  return tasklist
+  return task
 
 #check if a job is running on a given server
 def isrunning(srv, pid):
   if len(srv)<1 or pid<1:
     return -1
 
-  out = sshexc(srv, "ps -fe|grep 'bin/main_u1'|grep ' "+ str(pid) +" '|grep -v grep|wc -l" )
+  out = sshexc(srv, "ps -fe|grep 'bin/main_'|grep ' "+ str(pid) +" '|grep -v grep|wc -l" )
   r = 0
   try:
     r = int(out)
@@ -387,7 +403,7 @@ def fixunreachable( tasklist ):
     if tasklist[t][3] == 'unreachable':
 
       srv = tasklist[t][1]
-      pid = tasklist[t][2]
+      pid = tasklist[t][3]
 
       r = isrunning(srv, pid)
 
@@ -411,8 +427,8 @@ def fixunreachable( tasklist ):
           break
         if npid>0:
           tasklist[t][1] == host
-          tasklist[t][2] == npid
-          tasklist[t][3] == 'running'
+          tasklist[t][2] == 'running'
+          tasklist[t][3] == npid
           resubmitted = resubmitted + 1
         else:
           print("Invalid pid "+ str(npid) )
@@ -420,13 +436,13 @@ def fixunreachable( tasklist ):
   print("Closed: "+ str(closed) +"\nResubmitted: "+ str(resubmitted))
 
 #kill all submitted processed in the tasklist
-def killall( tasklist ):
+def kill( tasklist ):
 
-  for t in tasklist.keys():
+  for t in sorted(tasklist.keys()):
     srv = tasklist[ t ][1]
     if len(srv)==0:
       continue
-    pid = tasklist[ t ][2]
+    pid = tasklist[ t ][3]
 
     print "Killing process '"+ str(pid) +"' on '"+ srv +"'."
     sshexc(srv, "kill -9 "+ str(pid) )
@@ -438,7 +454,7 @@ def killall( tasklist, server ):
     srv = tasklist[ t ][1]
     if srv!=server:
       continue
-    pid = tasklist[ t ][2]
+    pid = tasklist[ t ][3]
 
     print "Killing process '"+ str(pid) +"' on '"+ srv +"'."
     sshexc(srv, "kill -9 "+ str(pid) )

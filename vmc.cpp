@@ -27,6 +27,10 @@ void vmc::set_wf( wavefunction* wf)
 //set the number of bins
 void vmc::initialize(int n)
 {
+  if( n < 2 ) {
+    cout << "ERROR: vmc::initialize() bin number must be > 1\n";
+    exit(-1);
+  }
   nk = n;
   cout << "init with nk=" << nk << "\n"; 
   mywf->initiate_f( nk );
@@ -90,7 +94,7 @@ void vmc::run()
 
   for(int i=0; i<nk; i++) //loop over bins for variance
   {
-    if( i>0 && i%1 == 0 ) estimate_time( time_start, nk, i );
+    if( i>0 && i%20 == 0 ) estimate_time( time_start, nk, i );
 
     mywf->walk_accumulate();
 
