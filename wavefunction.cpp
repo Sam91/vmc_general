@@ -198,6 +198,7 @@ void wavefunction::accumulate()
 
 //#include "measurement_all_chain.cpp"
 #include "measurement_nnn.cpp"
+//#include "measurement_subl.cpp"
 
   for(int no=0; no<NO; no++) f0[no] += fj[no];
 }

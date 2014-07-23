@@ -1,5 +1,6 @@
 #include "helperfunctions.h"
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <cstring>
 #include <iomanip>
@@ -185,6 +186,24 @@ int load_v(int* v, int n, const char* filename)
   if(pfile==NULL) {cout << "Error: cannot open file\n"; return -1;}
   if(fread(v, sizeof(int), n, pfile)){};
   fclose(pfile);
+  return 0;
+}
+
+//append a list of doubles to a file
+int fappend(double* f, int n, const char* filename)
+{
+  std::ofstream pfile;
+  pfile.open( filename, fstream::app|fstream::out );
+
+  //FILE* pfile = fopen(filename, "wb");
+  if(pfile==NULL) {cout << "Error: cannot open file\n"; return -1;}
+
+  for(int i=0; i<n; i++)
+    pfile << f[i] << ", ";
+  pfile << "\n";
+
+  pfile.close();
+  //fclose(pfile);
   return 0;
 }
 

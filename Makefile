@@ -13,7 +13,7 @@
 #MAIN = main_u1hyb2
 #MAIN = main_he_col
 #MAIN = main_he1
-MAIN = main_he_kag2
+MAIN = main_he_kag
 
 CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefunction.cpp vmc.cpp matrix.cpp mysql_wrapper.cpp spinone.cpp u1.cpp twoflavor.cpp u1two.cpp u1hybrid.cpp u1hybtwo.cpp paired2k.cpp u1kagome.cpp u1real.cpp huseelser.cpp he_two.cpp
 #u1dirac.cpp

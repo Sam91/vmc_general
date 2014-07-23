@@ -410,6 +410,76 @@ void he_two::set_cbc2()
   }
 }
 
+// Set the sq3 x sq3 state on the kagome lattice
+void he_two::set_sq3()
+{
+  if( Q!=3 || DIM!=2 )
+  {
+    cout << "ERROR: we need Q=3 and a Kagome lattice to use he_two::set_sq3()\n";
+    exit(-1);
+  }
+
+  cout << "he_two::set_sq3()\n";
+
+#if WFC
+  pars->desc = "he-sq3";
+#else
+  pars->desc = "he-sq3-r";
+#endif
+
+  int q, j1, j2;
+  double cp, sp;
+
+  for(int j=0; j<N; j++)
+  {
+    q = j % Q; j1 = (j/Q)%L; j2 = (j/Q)/L;
+
+    switch( (j1+j2)%3 )
+    {
+      case 0: //A
+        if( q==1 )
+        {
+          cp = 1.; sp = 0.;
+        } else 
+        {
+          cp = cos(tPi/6.); sp = sin(tPi/6.);
+        }
+        break;
+
+      case 1: //B
+        if( q==1 )
+        {
+          cp = cos(tPi/6.); sp = sin(tPi/6.);
+        } else 
+        {
+          cp = cos(tPi/3.); sp = sin(tPi/3.);
+        }
+        break;
+
+      case 2: //C
+        if( q==1 )
+        {
+          cp = cos(tPi/3.); sp = sin(tPi/3.);
+        } else 
+        {
+          cp = 1.; sp = 0.;
+        }
+        break;
+
+      default:
+        exit(-1);
+    }
+
+#if WFC
+    d[0][j] = complex<double>(cp,sp); //x-y plane
+    d[1][j] = complex<double>(cp,-sp);
+#else
+    d[0][j] = cp + sp; //x-z plane
+    d[1][j] = -cp + sp;
+#endif
+  }
+}
+
 int he_two::insert_db()
 {
   mysql_wrapper* wrapper = new mysql_wrapper();
@@ -430,6 +500,20 @@ int he_two::insert_db()
   delete wrapper;
 
   return res;
+}
+
+int he_two::insert_file(const char *name)
+{
+  double* f = new double[9];
+
+  for(int i=0; i<3; i++) f[i]   = js[i];
+  for(int i=0; i<3; i++) f[i+3] = average[i];
+  for(int i=0; i<3; i++) f[i+6] = sigma[i];
+
+  int r = fappend(f, 9, name);
+
+  delete[] f;
+  return r;
 }
 
 /*
