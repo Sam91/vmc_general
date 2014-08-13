@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 
 #servers = {'ghast','lockheed','mimic','marrow','tapir','vega','beryl','cavallieri','ember','colossus','yumi','pyro','bosons','trasses','callisto','sage','rox','cypher','iceberg','maggott','patch','mara','pongo','lisdal','sarabi','saravone','rosemayor','fifi','crush','cyborg','diego','choupette','bishop','bruce','solar','valerie','synch','droopy','grey','tornade','shadowcat','rovni','domino','duchesse','dazzler','clochette','biscotte','epervier','forge','magneto','khimaira','angel','peach','gambit','moonstar','havok','professorx','philos','phenix','prunelle','quinine','deb','polaris'}
 
-servers = ['phenix','philos','maggott','iceberg','fifi','bishop','droopy','vega','clochette','choupette','christopher','bosons','polaris','magneto','professorx','solar','crush','trasses','forge','cypher']
+servers = ['phenix','philos','maggott','iceberg','fifi','bishop','droopy','vega','clochette','choupette','christopher','bosons','polaris','magneto','professorx','solar','crush','trasses','forge','cypher','rovni','tornade','havok']
 
 #taking out 'christopher' because it is slow
 #taking out 'haurele' since Talbot is rebooting it
@@ -255,7 +255,7 @@ def submit( task ):
       continue
 
     #print "Submitting job in state '"+ str(sts) +"'"
-    print task[t]
+    #print task[t]
 
     [host, pid] = submit_job( cmd, nservers )
 

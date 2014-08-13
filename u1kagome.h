@@ -36,6 +36,7 @@ public:
 
   virtual void print();
   virtual int insert_db();
+  virtual int insert_file(const char*);
   //virtual void print_avgs();
 
   void set_hopping();
