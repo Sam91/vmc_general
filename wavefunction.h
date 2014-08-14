@@ -1,13 +1,14 @@
 #include "isingstate.h"
 #include "mysql_wrapper.h"
+#include <iomanip>
 
 //This is a virtual class for a wave function
 
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
 
-#define WFC 1
-#define JASTROW 0
+#define WFC 0
+#define JASTROW 1
 
 //number of real observables
 //#define NO 5 //this is now set in wavefunction.cpp (bcs we want to make it depend on system size)

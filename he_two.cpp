@@ -27,10 +27,10 @@ void he_two::print()
   }
 }
 
-//set a spiral state; the angles are in units of 2Pi
-void he_two::set_spiral(double phi1, double phi2)
+//set a spiral state; the angles are in units of 2Pi (two dimensions)
+void he_two::set_spiral2(double phi1, double phi2)
 {
-  cout << "he_two::set_spiral(" << phi1 << ", " << phi2 << ")\n";
+  cout << "he_two::set_spiral2(" << phi1 << ", " << phi2 << ")\n";
 
   //this only works without sublattice
   if( Q>1 )
@@ -41,7 +41,7 @@ void he_two::set_spiral(double phi1, double phi2)
 
   pars->phi1 = phi1;
   pars->phi2 = phi2;
-  pars->desc = "he-spiral";
+  pars->desc = "he-spiral2";
 
   int i1=0;
   double cp, sp;
@@ -61,6 +61,46 @@ void he_two::set_spiral(double phi1, double phi2)
 #endif
       i1++;
     }
+  }
+}
+
+//set a spiral state; the angles are in units of 2Pi (one dimensions)
+void he_two::set_spiral1( double phi )
+{
+  cout << "he_two::set_spiral1(" << phi << ")\n";
+
+  //this only works without sublattice
+  if( Q>1 )
+  {
+    cout << "ERROR: cannot use this function if Q>1\n";
+    exit(-1);
+  }
+
+  ostringstream out;
+#if WFC
+  out << "he-spiral1c "<< setprecision(1) << phi;
+#else
+  out << "he-spiral1r "<< setprecision(1) << phi;
+#endif
+
+  pars->phi1 = phi;
+  pars->desc = out.str();
+
+  int i1=0;
+  double cp, sp;
+
+  for(int i=0; i<L; i++)
+  {
+    cp = cos( ( i*phi )*tPi/2. ); //divide by 2 for spin-1/2
+    sp = sin( ( i*phi )*tPi/2. );
+#if WFC
+    d[0][i1] = complex<double>(cp,sp); //x-y plane
+    d[1][i1] = complex<double>(cp,-sp);
+#else
+    d[0][i1] = cp + sp; //x-z plane
+    d[1][i1] = -cp + sp;
+#endif
+    i1++;
   }
 }
 
