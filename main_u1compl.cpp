@@ -8,15 +8,19 @@
 
 int main(int argc, char *argv[])
 {
-  int req_args = 14;
+  int req_args = 15;
 
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << endl;
 
   cout << "PID: " << getpid() << endl;
 
-  if(argc-1<req_args) {
+  char* name = new char[200]; gethostname(name, 200);
+  cout << "hostname: "<< name << endl; delete[] name;
+
+  if(argc-1 != req_args) {
     cout << "Error: incorrect number of arguments\n";
+    cout << argv[0] << " L apx apy e2 tR gR smu xi1 xi2 xi3 a1 a2 a3 mc_len nbin\n";
     exit(-1);
   }
 
@@ -42,7 +46,7 @@ int main(int argc, char *argv[])
   wf->pars->a[2] = ((double)atoi(argv[13]))/600.; 
 
   wf->set_lattice( "kagome" );
-  wf->set_mc_length( 80 );
+  wf->set_mc_length( atoi(argv[14]) );
 
   string str;
   if( wf->pars->TR )
@@ -71,7 +75,7 @@ int main(int argc, char *argv[])
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
 
-  myvmc->initialize( atoi(argv[14]) ); //number of bins to average over
+  myvmc->initialize( atoi(argv[15]) ); //number of bins to average over
   myvmc->run();
   myvmc->calculate_statistics();
   wf->insert_db();
