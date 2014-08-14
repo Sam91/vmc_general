@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << "\n";
 
-  if(argc<req_args+1)
+  if(argc != req_args+1)
   {
     cout << "Error: incorrect number of arguments\n";
     exit(-1);
@@ -30,8 +30,6 @@ int main(int argc, char *argv[])
     wf->set_cbc1();
   else if( cbc==2 )
     wf->set_cbc2();
-  else if( cbc==3 )
-    wf->set_sq3();
   else
     wf->set_q0();
 
@@ -43,12 +41,9 @@ int main(int argc, char *argv[])
 
   myvmc->initialize( atoi(argv[5]) ); //number of bins to average over
   
-  //wf->js[0] = atoi(argv[3])/100.; //j1
+  //wf->js[0] = atoi(argv[3])/1000.; //j1
   //wf->js[1] = atoi(argv[4])/100.; //j2
-  //wf->js[2] = atoi(argv[5])/100.; //j3
-
-  double j1 = atoi(argv[3])/1000.; //j1
-  double j2 = atoi(argv[4])/1000.; //j1
+  //wf->js[2] = atoi(argv[4])/1000.; //j3
 
 //  myvmc->run();
 //  myvmc->calculate_statistics();
@@ -57,12 +52,16 @@ int main(int argc, char *argv[])
   //wf->calculate_exact();
   //wf->print_f0();
 
-
-  for(double j3=0; j3<=1.4; j3+=.02)
+  //double j1 = atoi(argv[3])/1000.;
+  //for(double j2=.45-j1-.05; j2<=.45-j1+.05; j2+=.005)
+  double j1 = atoi(argv[3])/1000.;
+  double j2 = atoi(argv[4])/1000.;
+  for(double j3=.1; j3<=.35; j3+=.005)
   {
-      wf->js[0] = j1;
-      wf->js[1] = j2;
-      wf->js[2] = j3;
+      wf->js[ 0 ] = j1;
+      wf->js[ 1 ] = j2;
+      wf->js[ 2 ] = j3;
+
       try
       {
         myvmc->run();
@@ -71,8 +70,6 @@ int main(int argc, char *argv[])
       } catch (int e) {
         continue;
       }
-      //scan the specified component
-      //wf->js[ atoi(argv[6]) ] += .02;
   }
   
   delete myvmc;

@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
   cout << endl;
   cout << "PID: " << getpid() << endl;
 
-  if(argc-1<req_args) {
+  if(argc-1 != req_args) {
     cout << "Error: incorrect number of arguments\n";
     exit(-1);
   }
@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
 
   u1kagome* wf = new u1kagome( L );
 
-  wf->pars->apx = atoi(argv[2]); // P/AP boundary conditions
-  wf->pars->apy = atoi(argv[3]);
+  wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
+  wf->pars->ap[1] = atoi(argv[3]);
 
   wf->pars->e2 = atoi(argv[4])==1 ? true : false ; // unit cell doubling
   wf->pars->TR = atoi(argv[5])==1 ? true : false ; // rotation breaking (staggering of hopping in the hexagon)
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   }
 
   wf->set_lattice( "kagome" );
-  wf->set_mc_length( 80 );
+  wf->set_mc_length( 40 );
 
   if( wf->pars->e2 )
     wf->pars->desc = "U(1) Dirac";

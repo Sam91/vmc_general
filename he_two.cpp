@@ -459,6 +459,11 @@ void he_two::set_sq3()
     exit(-1);
   }
 
+  if( L%3 != 0 )
+  {
+    cout << "WARN: for sq-3 state, the linear system size should be a multiple of 3 !!!\n\n";
+  }
+
   cout << "he_two::set_sq3()\n";
 
 #if WFC
