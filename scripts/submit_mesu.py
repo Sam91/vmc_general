@@ -10,6 +10,9 @@ kk=0
 full = False
 
 taskfile = str(sys.argv[1])
+mesufile = str(sys.argv[2])
+
+f = open(mesufile, "w")
 
 #open tasklist
 task = pickle.load( open(taskfile, "rb" ) )
@@ -25,22 +28,16 @@ for t in sorted(task.keys()):
   if stat==1 or stat == 'new':
     if not full:
       print task[ t ]
-      r = call(["/users/invites/sbieri/vmc_general/scripts/submit_slurm.sh", t, cmd])
+      f.write( '/home/bieri/vmc_general/bin/'+ cmd +' &\n' )
+      i=i+1
 
-      if r==0:
-        i=i+1
-      else:
+      if i>=64:
         full=True
-        continue
+        break
 
       task[ t ] = [cmd, '', 'submitted', 0] #command, host, status, pid
-    #else:
-    #  print task[ t ]
-    #  task[ t ] = [cmd, srv, stat, pid]
+
   else:
-    #if stat == 'new':
-    #  print tark[ t ]
-    #task[ t ] = [cmd, srv, stat, pid]
     kk=kk+1
 
 print "Submitted "+ str(i) +" new jobs; "+ str(len(task.keys()) - kk - i) +" still unsubmitted."
@@ -48,4 +45,9 @@ print "Submitted "+ str(i) +" new jobs; "+ str(len(task.keys()) - kk - i) +" sti
 if i>0:
   pickle.dump(task, open(taskfile, "wb") )
   print "Saved in "+ taskfile
+
+f.write( 'wait\n' )
+f.close()
+
+call( ['chmod','750',mesufile] )
 

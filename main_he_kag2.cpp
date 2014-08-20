@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
   //wf->print_f0();
 
 
-  for(double j3=0; j3<=1.4; j3+=.02)
+  //for(double j3=0; j3<=1.4; j3+=.02)
+  for(double j3=0; j3<=1.; j3+=.01)
   {
       wf->js[0] = j1;
       wf->js[1] = j2;
