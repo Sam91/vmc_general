@@ -3,7 +3,7 @@
 #include <iomanip>
 
 //define a general hybridized unpaired state on any lattice for NS flavors of fermions.
-
+//argument l: linear system size
 u1hybrid::u1hybrid(int l) : wavefunction( l )
 {
   if( N%NS != 0 ) {
@@ -65,6 +65,16 @@ u1hybrid::u1hybrid(int l) : wavefunction( l )
   h = 0.;
 
   mu = new double[NS];
+
+  e = new double[N*NS];
+#if WFC
+  v = createcomplex(N*NS);
+#else
+  v = createdouble(N*NS);
+#endif
+  Na0 = createdouble(NS*N, NS+2);
+  occ = new int[N];
+  for(int j=0; j<N; j++) occ[j]=0;
 }
 
 u1hybrid::~u1hybrid()
@@ -91,6 +101,11 @@ u1hybrid::~u1hybrid()
   delete[] old_x;
   delete[] N0;
   delete[] mu;
+
+  delete[] e;
+  destroy(v, N*NS);
+  destroy(Na0, N*NS);
+  delete[] occ;
 }
 
 /*void u1hybrid::print_t(int n1, int n2)
@@ -105,109 +120,152 @@ u1hybrid::~u1hybrid()
   }
 }*/
 
-//first, create the hamiltonian matrix; We take (a x N + r) as indices
-#if WFC
-void u1hybrid::create_h0( complex<double> **m )
-#else
-void u1hybrid::create_h0( double **m )
-#endif
+//first, create the Hamiltonian matrix; We take (a x N + r) as indices
+void u1hybrid::create_h0()
 {
   for(int i1=0; i1<NS*N; i1++)
     for(int i2=0; i2<NS*N; i2++)
-      m[i1][i2] = 0.;
+      v[i1][i2] = 0.;
 
-  for(int n1=0; n1<NS; n1++)
-    for(int n2=0; n2<NS; n2++)
+  for(int n1=0; n1<NS; n1++) {
+    for(int n2=0; n2<NS; n2++) {
       for(int i1=0; i1<N; i1++) {
         for(int i2=0; i2<N; i2++) {
-          m[n1*N + i1][n2*N + i2] = t[n1][n2][i1][i2]; //hopping matrix
+          v[n1*N + i1][n2*N + i2] = t[n1][n2][i1][i2]; //hopping matrix
         }
 #if WFC
-        m[n1*N + i1][n2*N + i1] -= h*conj(d[n1][i1])*d[n2][i1];
+        v[n1*N + i1][n2*N + i1] -= h*conj(d[n1][i1])*d[n2][i1];
 #else
-        m[n1*N + i1][n2*N + i1] -= h*d[n1][i1]*d[n2][i1];
+        v[n1*N + i1][n2*N + i1] -= h*d[n1][i1]*d[n2][i1];
 #endif
       }
+    }
+  }
 }
 
-//initialize the hybridized U(1) state
-void u1hybrid::create_ad()
+//calculate the MF spectrum and eigenvectors from the MF parameters
+void u1hybrid::diagonalize()
 {
-#if WFC
-  complex<double> **m = createcomplex(N*NS);
-#else
-  double **m = createdouble(N*NS);
-#endif
-
-  double *v = new double[N*NS];
-
-  double **Na0 = createdouble(NS*N, NS+2);
-  int *eigi = new int[N];
-
-  //construct the hamiltonian matrix using t, d and, h
-  create_h0( m );
+  //construct the Hamiltonian matrix using t, d and, h
+  create_h0(); //the Hamiltonian is saved in v
 
   //cout << "Hamiltonian matrix:\n";
-  //write_m(m, N*NS);
- 
-  eigvects(m, v, N*NS); //v is the eigenvalue vector and m contains the eigenvectors
+  //write_m(v, N*NS);
+
+  eigvects(v, e, N*NS); //e now contains the MF eigenvalues, and v the eigenvectors
 
 /*  cout << "Spectrum: ";
   for(int i=0; i<N*NS; i++) cout << i << ":" << v[i] << "; ";
   cout << "\n";
 */
 
-#if WFC
-  for(int i=0; i<N*NS; i++) {
-    if( abs(imag(v[i])) > 1e-3 )
-      cout << "WARN: imaginary eigenvalue " << v[i] << endl;
-  }
-#endif
-
-  //First, get the avg flavor number per eigenstate
-  for(int ne=0; ne<NS*N; ne++) //loop over eigenvectors
+  //Go through all eigenstates and get their avg flavor number
+  for(int ei=0; ei<NS*N; ei++) //loop through spectrum
   {
-    Na0[ne][NS] = ne;
-    Na0[ne][NS+1] = v[ne];
-    for(int n=0; n<NS; n++) {
-      Na0[ne][n] = 0.;
-      for(int i=0; i<N; i++) Na0[ne][n] += pow(abs(m[ne][n*N + i]), 2);
+    Na0[ei][NS] = ei; //the last two values contain the spectral index and the energy
+    Na0[ei][NS+1] = e[ei];
+    for(int f=0; f<NS; f++) { //loop through flavors
+      Na0[ei][f] = 0.;
+      for(int j=0; j<N; j++) Na0[ei][f] += pow(abs(v[ei][f*N + j]), 2); //loop through sites
     }
   }
+}
 
-  //determine the N eigenstates to be included; the index of the occupied states is stored in eigi[]
-
-  if( abs(v[N]-v[N-1])<SMALL ) //degenerate case
+//determine the N out of the 2N eigenstates to be occupied in the GS; the indices of those states are stored in occ[]
+void u1hybrid::construct_gs()
+{
+  if( abs(e[N]-e[N-1])<SMALL ) //degenerate at the Fermi level
   {
     cout << "WARN: Degenerate state; we need to fix this\n";
     cout << "(you may also consider changing boundary conditions or system size)\n";
 
-    //get lowest and highest index
+    //get the lowest and highest index
     int ne0, ne1;
     for(ne0=0; ne0<N; ne0++) {
-      if( abs(v[N-1] - v[ne0]) > SMALL ) eigi[ne0] = ne0;
+      if( abs(e[N-1] - e[ne0]) > SMALL ) occ[ne0] = ne0;
       else break;
     }
     for(ne1=ne0; ne1<N*NS; ne1++) {
-      if( abs(v[N-1] - v[ne1]) > SMALL ) break;
+      if( abs(e[N-1] - e[ne1]) > SMALL ) break;
     }
     cout << "Lowest and highest indices are " << ne0 << " and " << ne1 << ". ";
     cout << "We need to pick " << N-ne0 << " states out of " << ne1-ne0 << ".\n";
 
-    for(int i=0; i<ne1-ne0; i++) {
-      cout << i << ": " << v[i+ne0] << "; Na = ( ";
+    double *Nstmp = new double{NS};
+    for(int f=0; f<NS; f++) Nstmp[f] = (double)(N-ne0)/(double)NS;
+    cout << "Nstmp: "; for(int f=0; f<NS; f++) cout << Nstmp[f] << ", "; cout << endl;
+
+    for(int i=0; i<ne1-ne0; i++)
+    {
+      cout << i << ": " << e[i+ne0] << "; Na = ( ";
       for(int n=0; n<NS; n++) cout << Na0[i+ne0][n] << ", ";
       cout << ")\n";
     }
     cout << "Enter " << N-ne0 << " states: ";
     if( false ) //read in the states to use (choose by hand)
-      for(int i=ne0; i<N; i++) {cin >> eigi[i]; eigi[i] += ne0;}
+      for(int i=ne0; i<N; i++) {cin >> occ[i]; occ[i] += ne0;}
+
     else { //simply choose the first states that come
-      for(int i=ne0; i<N; i++) {cout << i-ne0 << " "; eigi[i] = i;}
+      int k = ne0;
+      for(int i=ne0; i<ne1; i++)
+      {
+        bool cont = false;
+        //cout << "Ntmp: "; for(int f=0; f<NS; f++) cout << Nstmp[f] << ", "; cout << endl;
+        for(int f=0; f<NS; f++) {if( Nstmp[f]-Na0[i][f] < -.1 ) cont = true;}
+        if( cont ) continue;
+
+        for(int f=0; f<NS; f++) Nstmp[f] -= Na0[i][f];
+
+        cout << i-ne0 << " ";
+        if( k>= N) break;
+        occ[k] = i; k++;
+      }
       cout << "\n";
     }
+    delete[] Nstmp;
   } else { //non-degenerate case
-    for(int i=0; i<N; i++) eigi[i] = i;
+    for(int i=0; i<N; i++) occ[i] = i;
+  }
+}
+
+//Construct a spinfull excitation on top of the GS
+void u1hybrid::construct_ex()
+{
+  //first, find the index if the lowest down spin
+  int ie;
+  for(ie=0; ie<N; ie++) {
+    cout << "e[" << ie << "] = " << e[ie] << ": Na[0] = " << Na0[ie][0] << endl;
+    if( Na0[ie][0]>.8 ) break;
+  }
+
+  int iex;
+  for(iex=N*NS-1; iex>=0; iex--) {
+    cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
+    if( Na0[iex][1]>.8 ) break;
+  }
+
+  //replace the state
+  for(int i=0; i<N; i++) 
+    if( occ[i]==ie ) {occ[i] = iex; break;}
+
+}
+
+//initialize the hybridized U(1) state (ground state)
+void u1hybrid::create_ad()
+{
+  cout << "Entering u1hybrid::create_ad()\n";
+
+  //construct Hamiltonian and diagonalize it
+  diagonalize();
+
+  //construct the MF GS
+  construct_gs();
+  //cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
+
+  //construct an exitation on top of the gs
+  //construct_ex();
+  //cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
+
 /*
     //calculate the A-matrix for the derivative
     for(int i1=0; i1<N*NS; i1++)
@@ -218,38 +276,42 @@ void u1hybrid::create_ad()
             for(int n1=0; n1<N; n1++) {
               for(int n2=N; n2<N*NS; n2++) {
 #if WFC
-                dad[i1][i2][k1][k2] += conj(m[n1][i1])*m[n1][i2]*m[n2][k1]*conj(m[n2][k2])/(v[n1] - v[n2]);
+                dad[i1][i2][k1][k2] += conj(v[n1][i1])*v[n1][i2]*v[n2][k1]*conj(v[n2][k2])/(e[n1] - e[n2]);
 #else
-                dad[i1][i2][k1][k2] += m[n1][i1]*m[n1][i2]*m[n2][k1]*m[n2][k2]/(v[n1] - v[n2]);
+                dad[i1][i2][k1][k2] += v[n1][i1]*v[n1][i2]*v[n2][k1]*v[n2][k2]/(e[n1] - e[n2]);
 #endif
               }
             }
           }
 */
-  }
 
-  //write the chosen N eigenvectors into the adx matrix
-  for(int n=0; n<NS; n++) N0[n] = 0.;
-  int ne;
-  for(ne=0; ne<N; ne++) {
-    for(int i1=0; i1<N; i1++) {
-      for(int n=0; n<NS; n++)
+  //write the chosen N eigenvectors into the adx matrix and calculate the avg flavor number
+  for(int f=0; f<NS; f++) N0[f] = 0.;
+
+  for(int ie=0; ie<N; ie++)
+  {
+    for(int j=0; j<N; j++) {
+      for(int f=0; f<NS; f++)
       {
-        adx[n][i1*N+ne] = m[ eigi[ne] ][n*N + i1]; //note that the eigenvalue index is the last index in adx!
-        N0[n] += pow( abs(m[ eigi[ne] ][n*N + i1]), 2);
+        adx[f][j*N+ie] = v[ occ[ie] ][f*N + j]; //note that the eigenvalue index is the last index in adx!
+        N0 [f] += pow( abs(v[ occ[ie] ][f*N + j]), 2);
       }
     }
   }
 
   cout << "Avg flavor number before projection: ";
-  for(int n=0; n<NS; n++) cout << N0[n] << ", ";
-  cout << "\n";
+  for(int f=0; f<NS; f++) cout << N0[f] << ", "; cout << "\n";
+
+  //set NF (wf projection) to the mean-field value
+  for(int f=0; f<NS; f++) NF[f] = round(N0[f]);
+  print_NF();
 
   //cout << "abs diff " << abs(v[i]-v[i-1]) << "\n";
 /*  if( abs(v[ne]-v[ne-1]) < 1e-8 )
     cout << "WARN: degenerate state\n";
   cout << "Fermi energy is " << v[ne-1] << ", " << v[ne] << " at position " << ne-1 << "\n"; 
 */
+
   cff = 1.;
   normalize( 3. );
 
@@ -258,11 +320,6 @@ void u1hybrid::create_ad()
     cout << "adx[ " << n << " ]\n";
     write_m(adx[n],N);
   }*/
-  
-  destroy(Na0, N*NS);
-  delete[] eigi;
-  destroy(m, N*NS);
-  delete[] v;
 }
 
 void u1hybrid::set_h(double h0) {cout << "Setting h to " << h0 << "\n"; h = h0;}

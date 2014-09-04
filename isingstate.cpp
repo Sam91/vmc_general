@@ -119,6 +119,10 @@ void isingstate::set_random_conf(int *Na0)
   }
   Na0[NS-1] = N-n;
 
+  cout << "Setting conf with Na = ";
+  for( int f=0; f<NS; f++) cout << Na0[f] << ", ";
+  cout << endl;
+
   int *ourNa = new int[NS];
   for(int i=0; i<NS; i++) ourNa[i] = Na[i] = Na0[i];
   
@@ -126,7 +130,8 @@ void isingstate::set_random_conf(int *Na0)
   //double *Nap = new double[na];
   int Nr, Nat;
 
-  for(int i=0; i<N; i++) {
+  for(int i=0; i<N; i++)
+  {
       //for(int k=0; k<na; k++)
       //  Nap[k] = (double)Na0[k]/(double)N0;
 

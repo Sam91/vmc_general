@@ -2,6 +2,7 @@
 #MAIN = test
 #MAIN = main_u1
 #MAIN = main_dirac
+MAIN = main_u1chain
 #MAIN = main_u1real
 #MAIN = main_u1compl
 #MAIN = main_u1exact
@@ -13,7 +14,7 @@
 #MAIN = main_u1hyb2
 #MAIN = main_he_col
 #MAIN = main_he
-MAIN = main_he_kag2
+#MAIN = main_he_kag2
 
 CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefunction.cpp vmc.cpp matrix.cpp mysql_wrapper.cpp spinone.cpp u1.cpp twoflavor.cpp u1two.cpp u1hybrid.cpp u1hybtwo.cpp paired2k.cpp u1kagome.cpp u1real.cpp huseelser.cpp he_two.cpp
 #u1dirac.cpp
@@ -45,9 +46,9 @@ link:
 	${GCC} -g0 -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 
 debug:
-	${GCC} -g -ggdb -Wall ${CLASSES} ${MAIN}.cpp -I. -c
+	${GCC} -g -ggdb -Wall -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I. -c
 	${GCC} -g -ggdb -Wall *.o -I. -o bin/${MAIN}_debug ${LFLAGS}
-	gdb ${MAIN}_debug
+	gdb bin/${MAIN}_debug
 
 clean:
 	rm -f *.o
@@ -60,6 +61,6 @@ prof:
 
 valgrind:
 	rm -f main*.o
-	${GCC} -c -Wall -g -O1 ${CLASSES} ${MAIN}.cpp -I.
+	${GCC} -c -Wall -g -O1 -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
 	${GCC} -Wall -g -O1 -L${LIB} *.o -I. -o bin/${MAIN}_debug ${LFLAGS}
 

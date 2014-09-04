@@ -4,10 +4,10 @@
 //argument: linear system size (DIM and SUBL are now compilation parameters)
 wavefunction::wavefunction( int l ) 
 {
-  this->L = l;
-  this->Q = SUBL;
+  L = l;
+  Q = SUBL;
 
-  this->LD = pow(L,DIM); this->N = LD*SUBL;
+  LD = pow(L,DIM); N = LD*SUBL;
 
   cout << "WF: setting number of sites to " << N << "\n";
 
@@ -84,6 +84,13 @@ wavefunction::~wavefunction()
   delete[] js;
 }
 
+void wavefunction::print_NF()
+{
+  cout << "NF = ";
+  for(int f=0; f<NS; f++ ) cout << NF[f] << ", ";
+  cout << endl;
+}
+
 void wavefunction::reset_run() {run = 0;}
 
 void wavefunction::set_lattice(const string& s)
@@ -113,10 +120,11 @@ void wavefunction::set_lattice(const string& s)
 
 void wavefunction::set_random_conf()
 {
-  int *N0 = new int[NS];
-  for(int n=0; n<NS; n++) N0[n] = N/NS;
-  alpha->set_random_conf( N0 );
-  delete[] N0;
+  int *Ntmp = new int[NS];
+  //for(int n=0; n<NS; n++) Ntmp[n] = N/NS;
+  for(int n=0; n<NS; n++) Ntmp[n] = NF[n];
+  alpha->set_random_conf( Ntmp );
+  delete[] Ntmp;
 }
 
 int wavefunction::save_alpha()
@@ -238,6 +246,7 @@ void wavefunction::initiate_f( int n )
   run = 0;
   nk = n;
 }
+
 void wavefunction::destroy_f( int n )
 {
   destroy(f, n);
@@ -410,9 +419,9 @@ bool wavefunction::step()
 
 void wavefunction::find_starting_conf()
 {
-  int* Na0 = new int[NS];
+  int* Ntmp = new int[NS];
 
-  for(int n=0; n<NS; n++) Na0[n] = NF[n];
+  for(int f=0; f<NS; f++) Ntmp[f] = NF[f];
 
   //find_max_conf();
 /*  int i, imax = 10000;
@@ -425,14 +434,14 @@ void wavefunction::find_starting_conf()
   if( i==imax) cout << "ERROR: cannot find non-zero configuration...\n";
 */
 
-  alpha->set_random_conf( Na0 );
+  alpha->set_random_conf( Ntmp );
   getwf();
 
   //cout << "Max config:\n";
   //alpha->print();
   //cout << "wf: " << wf << "\n";
 
-  delete[] Na0;
+  delete[] Ntmp;
 }
 
 //find the jastrow coefficient between two sites

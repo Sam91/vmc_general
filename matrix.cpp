@@ -968,7 +968,6 @@ void eigvects(complex<double> **m, double* w, int N)
   //write_m(m, N);
 
   dcomplex wkopt;
-  dcomplex *work;
   double *e = new double[N];
   double *rwork = new double[3*N-2];
 
@@ -979,6 +978,7 @@ void eigvects(complex<double> **m, double* w, int N)
       AT[i+N*j].re = m[i][j].real();
       AT[i+N*j].im = m[i][j].imag();
     }
+    for(int j=i+1; j<N; j++) AT[i+N*j] = {0., 0.}; //to avoid uninit warning
   }
 
   n = N; lda = N;
@@ -987,7 +987,7 @@ void eigvects(complex<double> **m, double* w, int N)
   zheev_(const_cast<char *>("V"), const_cast<char *>("L"), &n, AT, &lda, w, &wkopt, &lwork, rwork, &info);
 
   lwork = (int)wkopt.re;
-  work = new dcomplex[lwork]; 
+  dcomplex *work = new dcomplex[lwork]; 
 
   zheev_(const_cast<char *>("V"), const_cast<char *>("L"), &n, AT, &lda, e, work, &lwork, rwork, &info);
 

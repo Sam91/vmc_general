@@ -44,14 +44,14 @@ private:
 #if WFC
   complex<double> **adx, ***dadp, ***dad;
   complex<double> *current_inv, *old_inv;
-
-  void create_h0(complex<double>**);
 #else
   double **adx, ***dadp, ***dad;
   double *current_inv, *old_inv;
-
-  void create_h0(double**);
 #endif
+  void create_h0();
+  void diagonalize();
+  void construct_gs();
+  void construct_ex();
 
   int *current_x, *old_x;
 
@@ -72,6 +72,16 @@ protected:
 
   double h;   // H = T - h D (strength of hopping vs projection)
   double *mu; // chemical potentials (d and mu are actually redundant parametrizations to t; but that's ok)
+
+  //mean-field spectrum and eigenvectors
+  double *e; //eigenvalues
+#if WFC
+  complex<double> **v; //eigenvectors
+#else
+  double **v;
+#endif
+  double **Na0; //avg flavor number of each eigenvector
+  int *occ; //indices of the occupied MF eigenvectors
 };
 
 #endif
