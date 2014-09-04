@@ -987,7 +987,7 @@ void eigvects(complex<double> **m, double* w, int N)
   zheev_(const_cast<char *>("V"), const_cast<char *>("L"), &n, AT, &lda, w, &wkopt, &lwork, rwork, &info);
 
   lwork = (int)wkopt.re;
-  dcomplex *work = new dcomplex[lwork];
+  dcomplex *work = new dcomplex[lwork]; 
 
   zheev_(const_cast<char *>("V"), const_cast<char *>("L"), &n, AT, &lda, e, work, &lwork, rwork, &info);
 
