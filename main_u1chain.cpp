@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
   wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
 
-  bool search_mu = atoi(argv[3])==1 ? true : false ; // search for the chemical pot or set it to zero
+  bool search_mu = false; //atoi(argv[3])==1 ? true : false ; // search for the chemical pot or set it to zero
 
   wf->pars->xi[0] = ((double)atoi(argv[4]))/100.; //all xi fixed
   wf->pars->xi[1] = ((double)atoi(argv[5]))/100.;
@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
   wf->set_mc_length( atoi(argv[7]) );
 
   wf->pars->desc = "U(1) chain"; 
+  wf->set_excit( atoi(argv[3]), 0 );
 
   if( search_mu ) {
     if( wf->findmu()==-1 ) {

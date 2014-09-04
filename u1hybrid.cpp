@@ -75,6 +75,8 @@ u1hybrid::u1hybrid(int l) : wavefunction( l )
   Na0 = createdouble(NS*N, NS+2);
   occ = new int[N];
   for(int j=0; j<N; j++) occ[j]=0;
+  isocc = new bool[NS*N];
+  excit = -1;
 }
 
 u1hybrid::~u1hybrid()
@@ -106,6 +108,7 @@ u1hybrid::~u1hybrid()
   destroy(v, N*NS);
   destroy(Na0, N*NS);
   delete[] occ;
+  delete[] isocc;
 }
 
 /*void u1hybrid::print_t(int n1, int n2)
@@ -119,6 +122,18 @@ u1hybrid::~u1hybrid()
     cout << "\n";
   }
 }*/
+
+void u1hybrid::set_excit(int x, int s)
+{
+  cout << "Setting excit to "<< x << endl;
+  if( x>= 0 ) {
+    std::ostringstream os;
+    os << bpars->desc << "-" << x << "_" << s;
+    bpars->desc = os.str();
+  }
+  excit = x;
+  sp = s;
+}
 
 //first, create the Hamiltonian matrix; We take (a x N + r) as indices
 void u1hybrid::create_h0()
@@ -226,28 +241,108 @@ void u1hybrid::construct_gs()
   } else { //non-degenerate case
     for(int i=0; i<N; i++) occ[i] = i;
   }
+
+  //get the occupied states
+  for(int ie=0; ie<NS*N; ie++) isocc[ie] = false;
+  for(int j=0; j<N; j++) isocc[ occ[j] ] = true;
 }
 
-//Construct a spinfull excitation on top of the GS
+//Construct a spinfull/less two-particle excitation on top of the GS (largest energy)
 void u1hybrid::construct_ex()
 {
-  //first, find the index if the lowest down spin
+  //find lowest down spin hole
   int ie;
-  for(ie=0; ie<N; ie++) {
+  for(ie=0; ie<NS*N; ie++) {
+    if( !isocc[ie] ) continue;
     cout << "e[" << ie << "] = " << e[ie] << ": Na[0] = " << Na0[ie][0] << endl;
     if( Na0[ie][0]>.8 ) break;
   }
 
+  //find highest up excit
   int iex;
   for(iex=N*NS-1; iex>=0; iex--) {
+    if( isocc[iex] ) continue;
     cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
-    if( Na0[iex][1]>.8 ) break;
+    if( Na0[iex][sp]>.8 ) break;
   }
 
   //replace the state
   for(int i=0; i<N; i++) 
     if( occ[i]==ie ) {occ[i] = iex; break;}
+  isocc[ie] = false; isocc[iex] = true;
+}
 
+//half bandwidth
+void u1hybrid::construct_ex1()
+{
+  //find highest down spin hole
+  int ie;
+  for(ie=NS*N-1; ie>=0; ie--) {
+    if( !isocc[ie] ) continue;
+    cout << "e[" << ie << "] = " << e[ie] << ": Na[0] = " << Na0[ie][0] << endl;
+    if( Na0[ie][0]>.8 ) break;
+  }
+
+  //find highest up spin excit
+  int iex;
+  for(iex=N*NS-1; iex>=0; iex--) {
+    if( isocc[iex] ) continue;
+    cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
+    if( Na0[iex][sp]>.8 ) break;
+  }
+
+  //replace the state
+  for(int i=0; i<N; i++)
+    if( occ[i]==ie ) {occ[i] = iex; break;}
+  isocc[ie] = false; isocc[iex] = true;
+}
+
+void u1hybrid::construct_ex2()
+{
+  //find the lowest down spin hole
+  int ie;
+  for(ie=0; ie<NS*N; ie++) {
+    if( !isocc[ie] ) continue;
+    cout << "e[" << ie << "] = " << e[ie] << ": Na[0] = " << Na0[ie][0] << endl;
+    if( Na0[ie][0]>.8 ) break;
+  }
+
+  //find lowest up spin excit
+  int iex;
+  for(iex=0; iex<NS*N; iex++) {
+    if( isocc[iex] ) continue;
+    cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
+    if( Na0[iex][sp]>.8 ) break;
+  }
+
+  //replace the state
+  for(int i=0; i<N; i++)
+    if( occ[i]==ie ) {occ[i] = iex; break;}
+  isocc[ie] = false; isocc[iex] = true;
+}
+
+void u1hybrid::construct_ex3()
+{
+  //find the highest down spin hole
+  int ie;
+  for(ie=NS*N-1; ie>=0; ie--) {
+    if( !isocc[ie] ) continue;
+    cout << "e[" << ie << "] = " << e[ie] << ": Na[0] = " << Na0[ie][0] << endl;
+    if( Na0[ie][0]>.8 ) break;
+  }
+
+  //find lowest up spin excit
+  int iex;
+  for(iex=0; iex<NS*N; iex++) {
+    if( isocc[iex] ) continue;
+    cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
+    if( Na0[iex][sp]>.8 ) break;
+  }
+
+  //replace the state
+  for(int i=0; i<N; i++)
+    if( occ[i]==ie ) {occ[i] = iex; break;}
+  isocc[ie] = false; isocc[iex] = true;
 }
 
 //initialize the hybridized U(1) state (ground state)
@@ -260,12 +355,18 @@ void u1hybrid::create_ad()
 
   //construct the MF GS
   construct_gs();
-  //cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
-
-  //construct an exitation on top of the gs
-  construct_ex();
   cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
 
+  //construct an exitation on top of the gs
+
+  if( excit >= 0 )
+  {
+    if( excit==0 ) construct_ex();
+    else if(excit==1) construct_ex1();
+    else if(excit==2) construct_ex2();
+    else if(excit==3) construct_ex3();
+    cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
+  }
 /*
     //calculate the A-matrix for the derivative
     for(int i1=0; i1<N*NS; i1++)

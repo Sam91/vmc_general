@@ -39,6 +39,7 @@ public:
   virtual void correct_cff(bool);
   void normalize(double);
 
+  void set_excit( int, int );
 private:
 
 #if WFC
@@ -52,6 +53,9 @@ private:
   void diagonalize();
   void construct_gs();
   void construct_ex();
+  void construct_ex1();
+  void construct_ex2();
+  void construct_ex3();
 
   int *current_x, *old_x;
 
@@ -82,6 +86,10 @@ protected:
 #endif
   double **Na0; //avg flavor number of each eigenvector
   int *occ; //indices of the occupied MF eigenvectors
+  bool *isocc;
+
+  int excit;
+  int sp; //spin of the excitation
 };
 
 #endif
