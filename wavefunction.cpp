@@ -183,9 +183,16 @@ void wavefunction::accumulate()
 
 #endif
 
-  if( abs(wf)<SMALL ) {
+  if( abs(wf)<SMALL )
+  {
     cout << "Vanishing wf in accumulate...\n";
     throw 3;
+  }
+
+  if( wf != wf )
+  {
+    cout <<"Wf is nan...\n";
+    throw 4;
   }
 
 /* 

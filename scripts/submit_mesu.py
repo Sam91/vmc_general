@@ -31,7 +31,7 @@ for t in sorted(task.keys()):
       f.write( '/home/bieri/vmc_general/bin/'+ cmd +' &\n' )
       i=i+1
 
-      if i>=64:
+      if i>=2*64:
         full=True
         break
 
