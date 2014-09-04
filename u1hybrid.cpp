@@ -191,6 +191,10 @@ void u1hybrid::construct_gs()
     cout << "Lowest and highest indices are " << ne0 << " and " << ne1 << ". ";
     cout << "We need to pick " << N-ne0 << " states out of " << ne1-ne0 << ".\n";
 
+    double *Nstmp = new double{NS};
+    for(int f=0; f<NS; f++) Nstmp[f] = (double)(N-ne0)/(double)NS;
+    cout << "Nstmp: "; for(int f=0; f<NS; f++) cout << Nstmp[f] << ", "; cout << endl;
+
     for(int i=0; i<ne1-ne0; i++)
     {
       cout << i << ": " << e[i+ne0] << "; Na = ( ";
@@ -200,10 +204,25 @@ void u1hybrid::construct_gs()
     cout << "Enter " << N-ne0 << " states: ";
     if( false ) //read in the states to use (choose by hand)
       for(int i=ne0; i<N; i++) {cin >> occ[i]; occ[i] += ne0;}
+
     else { //simply choose the first states that come
-      for(int i=ne0; i<N; i++) {cout << i-ne0 << " "; occ[i] = i;}
+      int k = ne0;
+      for(int i=ne0; i<ne1; i++)
+      {
+        bool cont = false;
+        //cout << "Ntmp: "; for(int f=0; f<NS; f++) cout << Nstmp[f] << ", "; cout << endl;
+        for(int f=0; f<NS; f++) {if( Nstmp[f]-Na0[i][f] < -.1 ) cont = true;}
+        if( cont ) continue;
+
+        for(int f=0; f<NS; f++) Nstmp[f] -= Na0[i][f];
+
+        cout << i-ne0 << " ";
+        if( k>= N) break;
+        occ[k] = i; k++;
+      }
       cout << "\n";
     }
+    delete[] Nstmp;
   } else { //non-degenerate case
     for(int i=0; i<N; i++) occ[i] = i;
   }
