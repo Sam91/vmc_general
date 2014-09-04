@@ -2,8 +2,9 @@
 #MAIN = test
 #MAIN = main_u1
 #MAIN = main_dirac
+MAIN = main_u1chain
 #MAIN = main_u1real
-MAIN = main_u1compl
+#MAIN = main_u1compl
 #MAIN = main_u1exact
 #MAIN = main_u1real_scan12
 #MAIN = main_u1compl_scan12
@@ -19,6 +20,7 @@ CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefuncti
 #u1dirac.cpp
 
 LFLAGS = lib/libtmglib.a lib/liblapack.a lib/libblas.a lib/libmysqlcppconn.so -lm -lgfortran
+# -lefence
 #LFLAGS = lib/libpfapack.a -llapack -lblas -lmysqlcppconn -lm -lgfortran
 
 #use e-fence or valgrind to debug memory problems
@@ -45,9 +47,9 @@ link:
 	${GCC} -g0 -O3 -L${LIB} *.o -I. -o bin/${MAIN} ${LFLAGS}
 
 debug:
-	${GCC} -g -ggdb -Wall ${CLASSES} ${MAIN}.cpp -I. -c
+	${GCC} -g -ggdb -Wall -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I. -c
 	${GCC} -g -ggdb -Wall *.o -I. -o bin/${MAIN}_debug ${LFLAGS}
-	gdb ${MAIN}_debug
+	gdb bin/${MAIN}_debug
 
 clean:
 	rm -f *.o
@@ -60,6 +62,6 @@ prof:
 
 valgrind:
 	rm -f main*.o
-	${GCC} -c -Wall -g -O1 ${CLASSES} ${MAIN}.cpp -I.
+	${GCC} -c -Wall -g -O1 -Wno-vla -std=gnu++11 ${CLASSES} ${MAIN}.cpp -I.
 	${GCC} -Wall -g -O1 -L${LIB} *.o -I. -o bin/${MAIN}_debug ${LFLAGS}
 

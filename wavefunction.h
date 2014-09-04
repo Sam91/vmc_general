@@ -7,7 +7,7 @@
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
 
-#define WFC 1
+#define WFC 0
 #define JASTROW 0
 
 //number of real observables
@@ -104,13 +104,14 @@ public:
   void calculate_exact();
   void accumulate_exact();
   void print_f0();
+  void print_NF();
 
 protected:
   isingstate* alpha;
 
   int L, Q, LD, N; //system size
 
-  int NO; //number of operator to calculate
+  int NO; //number of operators to measure
 
   bool accept( complex<double> );
   bool accept( double );
@@ -136,7 +137,7 @@ protected:
   double tPi, tPiL;
   complex<double> I;
 
-  int* NF; //Flavor number, if this wf is chosen to be such an eigenstate
+  int* NF; //Flavor number to which this wf is projected
   double cff;
   double norm;
 

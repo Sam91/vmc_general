@@ -206,6 +206,8 @@ void he_two::set_q0()
         cp = cos(tPi/3.);
         sp = sin(tPi/3.);
         break;
+      default:
+        cp = 0.; sp = 0.;
     }
 
 #if WFC

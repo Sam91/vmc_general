@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
   char* name = new char[200]; gethostname(name, 200);
   cout << "hostname: "<< name << endl; delete[] name;
 
-  if(argc-1 != req_args) {
+  if(argc-1 != req_args)
+  {
     cout << "Error: incorrect number of arguments\n";
     cout << argv[0] << " L apx apy e2 tR gR smu xi1 xi2 xi3 a1 a2 a3 mc_len nbin\n";
     exit(-1);
@@ -67,16 +68,24 @@ int main(int argc, char *argv[])
   wf->set_hoppingk( 0. );
 
   if( search_mu )
+  {
     if( wf->findmu()==-1 ) {
       cout << "Cannot continue..." << endl;
       exit(-1);
     }
+  } else
+    wf->create_ad();
+
+  wf->print_NF();
 
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
+  wf->print_NF();
 
   myvmc->initialize( atoi(argv[15]) ); //number of bins to average over
+  wf->print_NF();
   myvmc->run();
+  wf->print_NF();
   myvmc->calculate_statistics();
   wf->insert_db();
   delete myvmc;
