@@ -59,6 +59,8 @@ u1hybrid::u1hybrid(int l) : wavefunction( l )
 
 #endif
 
+  for(int i=0; i<NS; i++) for(int j=0;j<N;j++) d[i][j]=0.;
+
   current_x = new int[N];
   old_x = new int[N];
   N0 = new double[NS];
@@ -128,7 +130,7 @@ void u1hybrid::set_excit(int x, int s)
   cout << "Setting excit to "<< x << endl;
   if( x>= 0 ) {
     std::ostringstream os;
-    os << bpars->desc << "-" << x << "_" << s;
+    os << bpars->desc << "-a" << x << "_" << s;
     bpars->desc = os.str();
   }
   excit = x;
@@ -189,6 +191,8 @@ void u1hybrid::diagonalize()
 //determine the N out of the 2N eigenstates to be occupied in the GS; the indices of those states are stored in occ[]
 void u1hybrid::construct_gs()
 {
+  double *Nstmp = new double[NS];
+
   if( abs(e[N]-e[N-1])<SMALL ) //degenerate at the Fermi level
   {
     cout << "WARN: Degenerate state; we need to fix this\n";
@@ -206,7 +210,6 @@ void u1hybrid::construct_gs()
     cout << "Lowest and highest indices are " << ne0 << " and " << ne1 << ". ";
     cout << "We need to pick " << N-ne0 << " states out of " << ne1-ne0 << ".\n";
 
-    double *Nstmp = new double{NS};
     for(int f=0; f<NS; f++) Nstmp[f] = (double)(N-ne0)/(double)NS;
     cout << "Nstmp: "; for(int f=0; f<NS; f++) cout << Nstmp[f] << ", "; cout << endl;
 
@@ -237,7 +240,6 @@ void u1hybrid::construct_gs()
       }
       cout << "\n";
     }
-    delete[] Nstmp;
   } else { //non-degenerate case
     for(int i=0; i<N; i++) occ[i] = i;
   }
@@ -245,9 +247,11 @@ void u1hybrid::construct_gs()
   //get the occupied states
   for(int ie=0; ie<NS*N; ie++) isocc[ie] = false;
   for(int j=0; j<N; j++) isocc[ occ[j] ] = true;
+
+  delete[] Nstmp;
 }
 
-//Construct a spinfull/less two-particle excitation on top of the GS (largest energy)
+//Construct spinfull or -less two-particle excitations on top of the GS (largest energy)
 void u1hybrid::construct_ex()
 {
   //find lowest down spin hole

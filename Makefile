@@ -20,7 +20,6 @@ CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefuncti
 #u1dirac.cpp
 
 LFLAGS = lib/libtmglib.a lib/liblapack.a lib/libblas.a lib/libmysqlcppconn.so -lm -lgfortran
-# -lefence
 #LFLAGS = lib/libpfapack.a -llapack -lblas -lmysqlcppconn -lm -lgfortran
 
 #use e-fence or valgrind to debug memory problems

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <cstring>
 #include <iomanip>
+#include <sys/stat.h>
+#include <cerrno>
 
 //Allocates and returns a square 2d array of integers
 int** createint(int n) {
@@ -190,8 +192,16 @@ int load_v(int* v, int n, const char* filename)
 }
 
 //append a list of doubles to a file
-int fappend(double* f, int n, const char* filename)
+int fappend(const double* f, int n, string filename)
 {
+
+  cout << "Writing file '" << filename << "'\n";
+
+  //if( mkdir(filename.c_str(), 0700) ) {
+  //  cerr << "mkdir failed: " << strerror(errno) << '\n';
+  //  return 2;
+  //}
+
   std::ofstream pfile;
   pfile.open( filename, fstream::app|fstream::out );
 

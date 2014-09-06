@@ -2,7 +2,7 @@
 from subprocess import call
 import pickle
 
-filename = 'task_chain7'
+filename = 'task_chain9'
 
 task={}
 i=0
@@ -12,7 +12,8 @@ r=0
 #for k2 in range(-600,601,20):
 #  for k1 in range(20,601,20):
 
-for L in range(200,301,2):
+for L in range(50,251,2):
+    #n=-1
   for n in [-1, 0, 1, 2, 3]:
 #for j2 in range(-60,101,10):
 #  for j1 in range(-60,201,10):

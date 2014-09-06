@@ -172,17 +172,25 @@ int u1real::insert_db()
   return res;
 }
 
-int u1real::insert_file(const char *name)
+//int u1real::insert_file(const char *name)
+int u1real::insert_file(string name)
 {
-  double* f = new double[9];
+  int kk = 4+2*NO;
+  double* ftmp = new double[ kk ];
+  //cout << "allocating: " << kk << "\n";
 
-  for(int i=0; i<3; i++) f[i]   = pars->xi[i];
-  for(int i=0; i<3; i++) f[i+3] = average[i];
-  for(int i=0; i<3; i++) f[i+6] = sigma[i];
+  int idx = 0;
+  
+  ftmp[idx] = N; idx++;
+  for(int i=0; i<3 ; i++) { ftmp[i+idx] = pars->xi[i];} idx += 3;
+  for(int i=0; i<NO; i++) { ftmp[i+idx] = average[i]; } idx += NO;
+  for(int i=0; i<NO; i++) { ftmp[i+idx] = sigma[i];   } idx += NO;
 
-  int r = fappend(f, 9, name);
+  int r = fappend(ftmp, kk, name);
 
-  delete[] f;
+  delete[] ftmp;
+  ftmp = nullptr;
+
   return r;
 }
 

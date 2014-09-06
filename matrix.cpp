@@ -503,7 +503,7 @@ double update_row( double *row, int row_number, double *inv, int n)
   /* checking for degeneracy */
   if ( fabs(r)<TINY ) {
 //    ZERO_STATUS = 1; cout << "ZS by row\n";
-    return( 0. ); //We return 0 here and the move will be rejected
+    return 0.; //We return 0 here and the move will be rejected
   }
 
   double x;
@@ -528,7 +528,7 @@ complex<double> update_row( complex<double> *row, int row_number, complex<double
   /* checking for degeneracy */
   if ( abs(r)<TINY ) {
 //    ZERO_STATUS = 1; //cout << "ZS by row\n";
-    return( 0. ); //We return 0 here and the move will be rejected
+    return 0.; //We return 0 here and the move will be rejected
   }
 
   complex<double> x;
@@ -997,7 +997,6 @@ void eigvects(complex<double> **m, double* w, int N)
     for(int j=0; j<N; j++) {
       m[i][j] = complex<double>(AT[j+N*i].re, AT[j+N*i].im);
     }
-//    cout << "\n";
   }
 
   for(int i=0; i<N; i++) w[i]=e[i];
@@ -1013,14 +1012,12 @@ void eigvects(double **m, double* w, int N)
   //write_m(m, N);
 
   double wkopt;
-  double *work;
 
   double *AT = new double[N*N];
 
-  for(int i=0; i<N; i++) {
-    for(int j=0; j<=i; j++) {
-      AT[i+N*j] = m[i][j];
-    }
+  for(int i=0; i<N; i++)
+  {
+    for(int j=0; j<=i; j++) AT[i+N*j] = m[i][j];
   }
 
   n = N; lda = N;
@@ -1029,7 +1026,7 @@ void eigvects(double **m, double* w, int N)
   dsyev_(const_cast<char *>("V"), const_cast<char *>("L"), &n, AT, &lda, w, &wkopt, &lwork, &info);
 
   lwork = (int)wkopt;
-  work = new double[lwork];
+  double *work = new double[lwork];
 
   dsyev_(const_cast<char *>("V"), const_cast<char *>("L"), &n, AT, &lda, w, work, &lwork, &info);
 
@@ -1059,9 +1056,7 @@ void eigvals(complex<double> **m, double* w, int N)
   //cout << "starting copy loop\n";
 
   for(int i=0; i<N; i++) {
-    //cout << i << "\n"; 
     for(int j=0; j<=i; j++) {
-      //cout << j << "; "; 
       AT[i+N*j].re = m[i][j].real();
       AT[i+N*j].im = m[i][j].imag();
     }
@@ -1098,6 +1093,7 @@ void eigvals(double **m, double* w, int N)
     for(int j=0; j<=i; j++) {
       AT[i+N*j] = m[i][j];
     }
+    for(int j=i+1; j<N; N++) AT[i+N*j] = 0.;
   }
 
   n = N; lda = N;

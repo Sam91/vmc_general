@@ -53,7 +53,8 @@ public:
   virtual void print() =0;
   virtual int insert_db() =0;
   virtual void print_avgs();
-  virtual int insert_file(const char*) =0;
+  //virtual int insert_file(const char*) =0;
+  virtual int insert_file(string) =0;
 
   int getL();
   int getN();

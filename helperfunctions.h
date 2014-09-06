@@ -46,7 +46,8 @@ int load_v(double*, int, const char*);
 int save_v(int*, int, const char*);
 int load_v(int*, int, const char*);
 
-int fappend(double*, int, const char*);
+//int fappend(double*, int, const char*);
+int fappend(const double*, int, string);
 
 void copy_m(double**, double**, int );
 void copy_m(complex<double>**, complex<double>**, int );

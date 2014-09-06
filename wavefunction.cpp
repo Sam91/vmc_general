@@ -9,7 +9,6 @@ wavefunction::wavefunction( int l )
 
   LD = pow(L,DIM); N = LD*SUBL;
 
-  cout << "WF: setting number of sites to " << N << "\n";
 
   alpha = new isingstate( L );
 
@@ -19,6 +18,8 @@ wavefunction::wavefunction( int l )
   //NO = N-1; //all correlators on chain
   NO = 3;
   //NO = 15;
+
+  cout << "WF: setting number of sites to " << N << "; NO=" << NO << "\n";
 
   f0 = new double[NO];
   for(int no=0; no<NO; no++) f0[no] = 0.;
@@ -221,8 +222,8 @@ void wavefunction::accumulate_exact()
   norm += wf2;
   for(int i=0; i<NO; i++) fj[i] = 0.;
 
-//#include "measurement_all_chain.cpp"
-#include "measurement_nnn.cpp"
+#include "measurement_all_chain.cpp"
+//#include "measurement_nnn.cpp"
 
 //  cout << "fj: "; for(int no=0; no<NO; no++) cout << fj[no] << "; "; cout << "\n";
 
