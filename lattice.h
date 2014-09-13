@@ -4,10 +4,10 @@
 #define LATTICE_H
 
 //dimension of the lattice
-#define DIM 1
+#define DIM 2
 
 //number of sublattice sites
-#define SUBL 1
+#define SUBL 3
 
 #include <string>
 

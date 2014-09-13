@@ -2,9 +2,9 @@
 #MAIN = test
 #MAIN = main_u1
 #MAIN = main_dirac
-MAIN = main_u1chain
+#MAIN = main_u1chain
 #MAIN = main_u1real
-#MAIN = main_u1compl
+MAIN = main_u1compl
 #MAIN = main_u1exact
 #MAIN = main_u1real_scan12
 #MAIN = main_u1compl_scan12

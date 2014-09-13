@@ -31,7 +31,7 @@ for t in sorted(task.keys()):
       f.write( '/home/bieri/vmc_general/bin/'+ cmd +' &\n' )
       i=i+1
 
-      if i>=64:
+      if i>=5*64:
         full=True
         break
 
@@ -44,7 +44,7 @@ print "Submitted "+ str(i) +" new jobs; "+ str(len(task.keys()) - kk - i) +" sti
 
 if i>0:
   pickle.dump(task, open(taskfile, "wb") )
-  print "Saved in "+ taskfile
+  print "Unsubmitted in "+ taskfile +". Saved in "+ mesufile
 
 f.write( 'wait\n' )
 f.close()

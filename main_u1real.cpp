@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
 
   int L = atoi(argv[1]);
 
-  //u1real* wf = new u1real( L );
   u1kagome* wf = new u1kagome( L );
 
   wf->pars->ap[0] = atoi(argv[2]); // P/AP boundary conditions
@@ -41,12 +40,9 @@ int main(int argc, char *argv[])
   wf->pars->xi[1] = ((double)atoi(argv[ 9]))/100.;
   wf->pars->xi[2] = ((double)atoi(argv[10]))/100.;
 
-  //wf->set_lattice( "chain" );
   wf->set_lattice( "kagome" );
   wf->set_hoppingk( 0. );
   wf->set_mc_length( atoi(argv[11]) );
-
-  //wf->pars->desc = "U(1) chain"; 
 
   string str;
   if( wf->pars->TR )
@@ -60,12 +56,13 @@ int main(int argc, char *argv[])
     wf->pars->desc = string("U(1) FS r; ").append(str);
 
   if( search_mu )
+  {
     if( wf->findmu()==-1 ) {
       cout << "Cannot continue..." << endl;
       exit(-1);
     }
-
-  wf->print();
+  } else
+    wf->create_ad();
 
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
@@ -73,7 +70,9 @@ int main(int argc, char *argv[])
   myvmc->initialize( atoi(argv[12] ) ); //number of bins to average over
   myvmc->run();
   myvmc->calculate_statistics();
+
   wf->insert_db();
+  //wf->insert_file("third_r.out");
 
   delete myvmc;
 

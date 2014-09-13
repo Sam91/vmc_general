@@ -80,14 +80,13 @@ int main(int argc, char *argv[])
 
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
-  wf->print_NF();
 
   myvmc->initialize( atoi(argv[15]) ); //number of bins to average over
-  wf->print_NF();
   myvmc->run();
-  wf->print_NF();
   myvmc->calculate_statistics();
+
   wf->insert_db();
+  //wf->insert_file("third.out");
   delete myvmc;
 
   delete wf;

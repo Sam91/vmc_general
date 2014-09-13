@@ -16,6 +16,7 @@ wavefunction::wavefunction( int l )
 //  this->NO = Q*Q*LD; //here, we save all correlators, but average over lattice translations
 
   //NO = N-1; //all correlators on chain
+  //NO = 3*N;
   NO = 3;
   //NO = 15;
 
@@ -62,6 +63,12 @@ wavefunction::wavefunction( int l )
 
   //default mc length
   mc_length = 40;
+
+#if WFC
+  cout << "Wave function is complex.\n";
+#else
+  cout << "Wave function is real.\m";
+#endif
 }
 
 wavefunction::~wavefunction()
@@ -207,6 +214,7 @@ void wavefunction::accumulate()
 
 //#include "measurement_all_chain.cpp"
 #include "measurement_nnn.cpp"
+//#include "measurement_thrd.cpp"
 //#include "measurement_subl.cpp"
 
   for(int no=0; no<NO; no++) f0[no] += fj[no];
@@ -222,7 +230,7 @@ void wavefunction::accumulate_exact()
   norm += wf2;
   for(int i=0; i<NO; i++) fj[i] = 0.;
 
-#include "measurement_all_chain.cpp"
+//#include "measurement_all_chain.cpp"
 //#include "measurement_nnn.cpp"
 
 //  cout << "fj: "; for(int no=0; no<NO; no++) cout << fj[no] << "; "; cout << "\n";
@@ -255,9 +263,11 @@ void wavefunction::collect_data()
   for(int no=0; no<NO; no++)
   {
     f[run][no] = f0[no]/((double)(mc_length*LD));
+    //f[run][no] = f0[no]/((double)(mc_length));
     f0[no] = 0.;
 #if NP
-    for(int p=0; p<NP; p++) {
+    for(int p=0; p<NP; p++)
+    {
       fd[run][no][p] = f0d[no][p]/((double)(N*mc_length)) - f0d[NO][p]/((double)(mc_length));
       f0d[no][p] = 0.;
     }

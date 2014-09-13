@@ -73,10 +73,11 @@ void u1kagome::set_hoppingk(double mu0)
   else rr = !pars->TR;
 
   double srr; if( rr ) srr = -1.; else srr = 1.;
+  cout << "srr: "<< srr << endl;
 #if WFC
   double sri; if( pars->TR ) sri = -1.; else sri = 1.;
+  cout << "sri: "<< sri << endl;
 #endif
-
 
   //set the hopping matrix to zero
   for(int i=0; i<N; i++)
@@ -196,14 +197,14 @@ void u1kagome::set_hoppingk(double mu0)
 
         alpha->mylattice->getnq(n2, q2, i2); //get the cartesian coordinates for i2
 
-        //setting hopping to one on all third neighbors
-        if( q1!=1 ) {
+        //set hopping on third neighbors
+        if( q1==1 ) {
 #if WFC
-          t[n][n][i1][i2] = pars->xi[2]*complex<double>( srr*cos(M_PI*pars->a[2]), +sri*sin(M_PI*pars->a[2]) );
-          t[n][n][i2][i1] = pars->xi[2]*complex<double>( srr*cos(M_PI*pars->a[2]), -sri*sin(M_PI*pars->a[2]) );
+          t[n][n][i1][i2] = pars->xi[2]*(complex<double>( srr*cos(M_PI*pars->a[2]), +sri*sin(M_PI*pars->a[2]) ));
+          t[n][n][i2][i1] = pars->xi[2]*(complex<double>( srr*cos(M_PI*pars->a[2]), -sri*sin(M_PI*pars->a[2]) ));
         } else {
-          t[n][n][i1][i2] = pars->xi[2]*complex<double>( cos(M_PI*pars->a[2]), +sin(M_PI*pars->a[2]) );
-          t[n][n][i2][i1] = pars->xi[2]*complex<double>( cos(M_PI*pars->a[2]), -sin(M_PI*pars->a[2]) );
+          t[n][n][i1][i2] = pars->xi[2]*(complex<double>( cos(M_PI*pars->a[2]), +sin(M_PI*pars->a[2]) ));
+          t[n][n][i2][i1] = pars->xi[2]*(complex<double>( cos(M_PI*pars->a[2]), -sin(M_PI*pars->a[2]) ));
 #else
           t[n][n][i1][i2] = t[n][n][i2][i1] = srr*pars->xi[2];
         } else {
@@ -213,14 +214,15 @@ void u1kagome::set_hoppingk(double mu0)
 
         if( pars->e2 ) //unit cell doubling
         {
-          if( (n1[1])%2==0 ) {
-            if( q1==2 ) {
+          if( (n1[1])%2==1 ) {
+            if( q1!=2 ) {
               t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
             }
-          } else
-            if( q1==1 ) {
-              t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
-            }
+          }
+
+          if( q1!=0 ) {
+            t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
+          }
         }
 
         // boundary conditions
@@ -290,17 +292,23 @@ int u1kagome::insert_db()
   return res;
 }
 
-int u1kagome::insert_file(const char *name)
+int u1kagome::insert_file(string name)
 {
-  double* f = new double[9];
+  int kk = 4+2*NO;
+  double* ftmp = new double[ kk ];
 
-  for(int i=0; i<3; i++) f[i]   = js[i];
-  for(int i=0; i<3; i++) f[i+3] = average[i];
-  for(int i=0; i<3; i++) f[i+6] = sigma[i];
+  int idx = 0;
 
-  int r = fappend(f, 9, name);
+  ftmp[idx] = N; idx++;
+  for(int i=0; i<3 ; i++) { ftmp[i+idx] = pars->xi[i];} idx += 3;
+  for(int i=0; i<NO; i++) { ftmp[i+idx] = average[i]; } idx += NO;
+  for(int i=0; i<NO; i++) { ftmp[i+idx] = sigma[i];   } idx += NO;
 
-  delete[] f;
+  int r = fappend(ftmp, kk, name);
+
+  delete[] ftmp;
+  ftmp = nullptr;
+
   return r;
 }
 

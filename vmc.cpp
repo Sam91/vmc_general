@@ -94,8 +94,8 @@ void vmc::run()
 
   for(int i=0; i<nk; i++) //loop over bins for variance
   {
-    if( i>0 && i%50 == 0 ) estimate_time( time_start, nk, i );
-    //if( i>0 && i%2 == 0 ) estimate_time( time_start, nk, i );
+    //if( i>0 && i%10 == 0 ) estimate_time( time_start, nk, i );
+    if( i>0 && i%2 == 0 ) estimate_time( time_start, nk, i );
 
     mywf->walk_accumulate();
 
