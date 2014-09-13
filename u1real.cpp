@@ -190,17 +190,6 @@ int u1real::insert_file(string name)
   delete[] ftmp;
   ftmp = nullptr;
 
-int u1real::insert_file(const char *name)
-{
-  double* f = new double[9];
-
-  for(int i=0; i<3; i++) f[i]   = pars->xi[i];
-  for(int i=0; i<3; i++) f[i+3] = average[i];
-  for(int i=0; i<3; i++) f[i+6] = sigma[i];
-
-  int r = fappend(f, 9, name);
-
-  delete[] f;
   return r;
 }
 

@@ -67,7 +67,7 @@ wavefunction::wavefunction( int l )
 #if WFC
   cout << "Wave function is complex.\n";
 #else
-  cout << "Wave function is real.\m";
+  cout << "Wave function is real.\n";
 #endif
 }
 

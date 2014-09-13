@@ -253,17 +253,9 @@ void u1hybrid::construct_gs()
   delete[] Nstmp;
 }
 
-//Construct spinfull or -less two-particle excitations on top of the GS (largest energy)
-void u1hybrid::construct_ex()
-{
-  //find lowest down spin hole
-  int ie;
-  for(ie=0; ie<NS*N; ie++) {
-    if( !isocc[ie] ) continue;
-}
-
 //Construct a spinfull excitation on top of the GS
-void u1hybrid::construct_ex()
+
+void u1hybrid::construct_ex0()
 {
   //first, find the index if the lowest down spin
   int ie;
@@ -278,10 +270,6 @@ void u1hybrid::construct_ex()
     if( isocc[iex] ) continue;
     cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
     if( Na0[iex][sp]>.8 ) break;
-  int iex;
-  for(iex=N*NS-1; iex>=0; iex--) {
-    cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
-    if( Na0[iex][1]>.8 ) break;
   }
 
   //replace the state
@@ -379,7 +367,7 @@ void u1hybrid::create_ad()
 
   if( excit >= 0 )
   {
-    if( excit==0 ) construct_ex();
+    if( excit==0 ) construct_ex0();
     else if(excit==1) construct_ex1();
     else if(excit==2) construct_ex2();
     else if(excit==3) construct_ex3();
