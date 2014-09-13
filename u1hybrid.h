@@ -52,7 +52,6 @@ private:
   void create_h0();
   void diagonalize();
   void construct_gs();
-  void construct_ex();
   void construct_ex1();
   void construct_ex2();
   void construct_ex3();

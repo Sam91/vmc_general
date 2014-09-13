@@ -76,13 +76,13 @@ int main(int argc, char *argv[])
   } else
     wf->create_ad();
 
-  wf->print_NF();
-
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
 
   myvmc->initialize( atoi(argv[15]) ); //number of bins to average over
+  wf->print_NF();
   myvmc->run();
+  wf->print_NF();
   myvmc->calculate_statistics();
 
   wf->insert_db();

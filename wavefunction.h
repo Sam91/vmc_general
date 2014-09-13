@@ -7,7 +7,7 @@
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
 
-#define WFC 1
+#define WFC 0
 #define JASTROW 0
 
 //number of real observables

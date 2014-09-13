@@ -63,6 +63,12 @@ void huseelser::getwf()
   wf *= (jastrow()*cff);
 
   //cout << "huseelser::getwf(): " << std::scientific << wf << "\n";
+
+  if( wf != wf )
+  {
+    cout << "Wf is nan\n";
+    throw 4;
+  }
 }
 
 //swap states on two sites i1 and i2 (corresponding to virtual_replacement)
@@ -154,9 +160,9 @@ void huseelser::correct_cff(bool s)
   double r;
 
   if( s )
-    r = pow(1.1,N);
+    r = pow(1.02,N);
   else
-    r = pow(.9,N);
+    r = pow(.98,N);
 
   normalize( r );
   //cout << "TF: cff changed to " << cff[n_ext] << endl;
@@ -165,6 +171,12 @@ void huseelser::correct_cff(bool s)
 void huseelser::normalize(double r)
 {
   cff *= r;
-  cout << "Normalizing with r = " << r << "; cff = " << cff << endl;
+  if( std::isinf(cff) )
+  {
+    cout << "Overflow in cff. resetting...";
+    r = 1.;
+    cff = 1.;
+  }
+  cout << "Normalizing with r = " << std::scientific << setprecision(2) << r << "; cff = " << cff << endl;
 }
 

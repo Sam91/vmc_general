@@ -19,8 +19,8 @@ MAIN = main_u1compl
 CLASSES = helperfunctions.cpp isingstate.cpp subspace.cpp lattice.cpp wavefunction.cpp vmc.cpp matrix.cpp mysql_wrapper.cpp spinone.cpp u1.cpp twoflavor.cpp u1two.cpp u1hybrid.cpp u1hybtwo.cpp paired2k.cpp u1kagome.cpp u1real.cpp huseelser.cpp he_two.cpp
 #u1dirac.cpp
 
-LFLAGS = lib/libtmglib.a lib/liblapack.a lib/libblas.a lib/libmysqlcppconn.so -lm -lgfortran
-#LFLAGS = lib/libpfapack.a -llapack -lblas -lmysqlcppconn -lm -lgfortran
+#LFLAGS = lib/libtmglib.a lib/liblapack.a lib/libblas.a lib/libmysqlcppconn.so -lm -lgfortran
+LFLAGS = lib/libpfapack.a -llapack -lblas -lmysqlcppconn -lm -lgfortran
 
 #use e-fence or valgrind to debug memory problems
 #option: -lefence or lib/libefence.a

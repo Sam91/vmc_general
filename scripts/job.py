@@ -26,10 +26,9 @@ for r3 in range(1,97,2):
     #j3=400
     #j2 = 30
     #k1=400
-    sgn=1
+    #sgn=1
   #for sgn in [0,1]:
 
-#    t = "c3-"+str(k1)+'-'+str(k2)
 #    t = "q3:"+str(j1)+":"+str(j2)
     t = "r3-"+ str(L) + "-" + str(r3) +"."+ str(a2)
     r1 = 2

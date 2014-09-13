@@ -210,6 +210,7 @@ void u1hybrid::construct_gs()
     cout << "Lowest and highest indices are " << ne0 << " and " << ne1 << ". ";
     cout << "We need to pick " << N-ne0 << " states out of " << ne1-ne0 << ".\n";
 
+    double *Nstmp = new double{NS};
     for(int f=0; f<NS; f++) Nstmp[f] = (double)(N-ne0)/(double)NS;
     cout << "Nstmp: "; for(int f=0; f<NS; f++) cout << Nstmp[f] << ", "; cout << endl;
 
@@ -240,6 +241,7 @@ void u1hybrid::construct_gs()
       }
       cout << "\n";
     }
+    delete[] Nstmp;
   } else { //non-degenerate case
     for(int i=0; i<N; i++) occ[i] = i;
   }
@@ -258,6 +260,14 @@ void u1hybrid::construct_ex()
   int ie;
   for(ie=0; ie<NS*N; ie++) {
     if( !isocc[ie] ) continue;
+}
+
+//Construct a spinfull excitation on top of the GS
+void u1hybrid::construct_ex()
+{
+  //first, find the index if the lowest down spin
+  int ie;
+  for(ie=0; ie<N; ie++) {
     cout << "e[" << ie << "] = " << e[ie] << ": Na[0] = " << Na0[ie][0] << endl;
     if( Na0[ie][0]>.8 ) break;
   }
@@ -268,6 +278,10 @@ void u1hybrid::construct_ex()
     if( isocc[iex] ) continue;
     cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
     if( Na0[iex][sp]>.8 ) break;
+  int iex;
+  for(iex=N*NS-1; iex>=0; iex--) {
+    cout << "e[" << iex << "] = "<< e[iex] << ": Na[0] = " << Na0[iex][0] << endl;
+    if( Na0[iex][1]>.8 ) break;
   }
 
   //replace the state
@@ -371,6 +385,12 @@ void u1hybrid::create_ad()
     else if(excit==3) construct_ex3();
     cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
   }
+  //cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
+
+  //construct an exitation on top of the gs
+  //construct_ex();
+  //cout << "occ: "; for(int i=0; i<N; i++) cout << occ[i] << ", "; cout << endl;
+
 /*
     //calculate the A-matrix for the derivative
     for(int i1=0; i1<N*NS; i1++)
