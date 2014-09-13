@@ -80,13 +80,12 @@ int main(int argc, char *argv[])
   myvmc->set_wf( wf );
 
   myvmc->initialize( atoi(argv[15]) ); //number of bins to average over
-  wf->print_NF();
   myvmc->run();
-  wf->print_NF();
   myvmc->calculate_statistics();
 
-  wf->insert_db();
-  //wf->insert_file("third.out");
+  //wf->insert_db();
+  wf->insert_file("correlator.out");
+
   delete myvmc;
 
   delete wf;
