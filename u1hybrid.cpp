@@ -125,16 +125,16 @@ u1hybrid::~u1hybrid()
   }
 }*/
 
-void u1hybrid::set_excit(int x, int s)
+void u1hybrid::set_excit(int x, int spin)
 {
   cout << "Setting excit to "<< x << endl;
   if( x>= 0 ) {
     std::ostringstream os;
-    os << bpars->desc << "-a" << x << "_" << s;
+    os << bpars->desc << "-ex" << x << "_" << spin;
     bpars->desc = os.str();
   }
   excit = x;
-  sp = s;
+  sp = spin;
 }
 
 //first, create the Hamiltonian matrix; We take (a x N + r) as indices
@@ -255,7 +255,8 @@ void u1hybrid::construct_gs()
 
 //Construct a spinfull excitation on top of the GS
 
-void u1hybrid::construct_ex0()
+//full bandwidth
+void u1hybrid::construct_ex3()
 {
   //first, find the index if the lowest down spin
   int ie;
@@ -327,7 +328,8 @@ void u1hybrid::construct_ex2()
   isocc[ie] = false; isocc[iex] = true;
 }
 
-void u1hybrid::construct_ex3()
+//Fermi surface excitations
+void u1hybrid::construct_ex0()
 {
   //find the highest down spin hole
   int ie;
