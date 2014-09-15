@@ -294,13 +294,17 @@ int u1kagome::insert_db()
 
 int u1kagome::insert_file(string name)
 {
-  int kk = 4+2*NO;
+  int kk = 10+2*NO;
   double* ftmp = new double[ kk ];
 
   int idx = 0;
 
   ftmp[idx] = N; idx++;
+  ftmp[idx] = pars->e2; idx++;
+  ftmp[idx] = pars->TR; idx++;
+  ftmp[idx] = pars->gR; idx++;
   for(int i=0; i<3 ; i++) { ftmp[i+idx] = pars->xi[i];} idx += 3;
+  for(int i=0; i<3 ; i++) { ftmp[i+idx] = pars->a[i];} idx += 3;
   for(int i=0; i<NO; i++) { ftmp[i+idx] = average[i]; } idx += NO;
   for(int i=0; i<NO; i++) { ftmp[i+idx] = sigma[i];   } idx += NO;
 

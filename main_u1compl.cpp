@@ -6,6 +6,10 @@
 
 // This is meant to be compiled with WFC=1
 
+#if ! WFC
+  #error Compile as real!
+#endif
+
 int main(int argc, char *argv[])
 {
   int req_args = 15;

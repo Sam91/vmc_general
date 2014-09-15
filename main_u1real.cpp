@@ -5,6 +5,10 @@
 //#include "u1real.h"
 #include "u1kagome.h"
 
+#if WFC
+  #error Compile as real!
+#endif
+
 int main(int argc, char *argv[])
 {
   int req_args = 12;
@@ -71,8 +75,8 @@ int main(int argc, char *argv[])
   myvmc->run();
   myvmc->calculate_statistics();
 
-  wf->insert_db();
-  //wf->insert_file("third_r.out");
+  //wf->insert_db();
+  wf->insert_file("correlator_r.out");
 
   delete myvmc;
 

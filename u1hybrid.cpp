@@ -417,7 +417,6 @@ void u1hybrid::create_ad()
 
   //set NF (wf projection) to the mean-field value
   for(int f=0; f<NS; f++) NF[f] = round(N0[f]);
-  print_NF();
 
   //cout << "abs diff " << abs(v[i]-v[i-1]) << "\n";
 /*  if( abs(v[ne]-v[ne-1]) < 1e-8 )

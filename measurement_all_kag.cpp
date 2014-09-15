@@ -17,7 +17,7 @@
     {
       for (int q1=0; q1<Q; q1++)
       {
-        j1 = q1 + Q*( L*x1 + y1);
+        j1 = q1 + Q*( x1 + L*y1);
 
         for (int x2=0; x2<L; x2++)
         {
@@ -31,13 +31,16 @@
 
             for (int q2=0; q2<Q; q2++)
             {
-              j2 = q2 + Q*( L*xx2 + yy2);
+              j2 = q2 + Q*( xx2 + L*yy2);
 
               if( j1==j2 )
-                fj[ q1 ] += .75;
+                fj[ q1 + Q*q2 ] += 2.;
               else
-                fj[ q1 + Q*(q2 + Q*(L*x2+y2)) ] += swap( j1, j2, true);
-
+#if WFC
+                fj[ q1 + Q*(q2 + Q*(x2 + L*y2)) ] += swap( j1, j2, true).real();
+#else
+                fj[ q1 + Q*(q2 + Q*(x2 + L*y2)) ] += swap( j1, j2, true);
+#endif
             }
           }
         }
