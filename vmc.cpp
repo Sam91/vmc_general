@@ -42,7 +42,7 @@ void vmc::thermalize()
 
   mywf->find_starting_conf();
 
-  int therm = 100;
+  int therm = 200;
 
   while( 1 )
   {
@@ -59,7 +59,7 @@ void vmc::thermalize()
     }
     cout << " thermalized.\n";
 
-    if( abs(mywf->wf) > 1e-4 ) break;
+    if( abs(mywf->wf) > 1e5*SMALL ) break;
     else
     {
       cout << "WARN(vmc): vanishing wf=" << mywf->wf << "\n";

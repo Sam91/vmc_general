@@ -13,11 +13,11 @@ wavefunction::wavefunction( int l )
   alpha = new isingstate( L );
 
   //the number of operators we want to average over
-//  this->NO = Q*Q*LD; //here, we save all correlators, but average over lattice translations
+  this->NO = Q*Q*LD; //here, we save all correlators, but average over lattice translations
 
   //NO = N-1; //all correlators on chain
   //NO = Q*N;
-  NO = 3;
+  //NO = 3;
   //NO = 15;
 
   cout << "WF: setting number of sites to " << N << "; NO=" << NO << "\n";
@@ -220,8 +220,8 @@ void wavefunction::accumulate()
  */
 
 //#include "measurement_all_chain.cpp"
-//#include "measurement_all_kag.cpp"
-#include "measurement_nnn.cpp"
+#include "measurement_all_kag.cpp"
+//#include "measurement_nnn.cpp"
 //#include "measurement_thrd.cpp"
 //#include "measurement_subl.cpp"
 
@@ -412,11 +412,20 @@ bool wavefunction::step()
 //    }
 //    else cout << "good agreement\n";
 
-    if( accept(p) )
+    if( abs(wf)>SMALL && accept(p) )
     {
       accepted++;
       //cout << "accepted: " << std::scientific << setprecision(1) << wf << "; |p|2=" << std::fixed << abs(p)*abs(p) << "\n";
-  
+
+/*
+      if( abs(wf_old)>SMALL && abs(wf)<SMALL ) 
+      {
+        cout << "WARN: move to small wf accepted!\n";
+        cout << "wf_old= " << std::scientific << setprecision(4) << wf_old << "; wf= " << wf << "; wf/wf_old= "<< wf/wf_old << "; p= " << p << "; p2= " << abs(p)*abs(p) << endl;
+        getwf();
+        cout << "Recalculated as wf = "<< wf << endl;
+      }
+*/
       return true;
     } else
     {

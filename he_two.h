@@ -29,7 +29,7 @@ public:
   virtual void print();
 //  void find_max_conf();
   virtual int insert_db();
-  virtual int insert_file(const char*);
+  virtual int insert_file( string );
   
 //  double jastrow();
 //  double jastrow(int, int);

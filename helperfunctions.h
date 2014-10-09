@@ -15,7 +15,7 @@ using namespace std;
 
 #include <stdlib.h>
 #ifndef GET_RAND
-#define GET_RAND ( (double)rand()/((double)RAND_MAX + 1.0) ) // the standard c library in stdlib.h
+#define GET_RAND ( (double)rand()/((double)RAND_MAX) ) // the standard c library in stdlib.h
 #endif
 
 

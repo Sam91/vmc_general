@@ -549,17 +549,22 @@ int he_two::insert_db()
   return res;
 }
 
-int he_two::insert_file(const char *name)
+int he_two::insert_file(string name)
 {
-  double* f = new double[9];
+  int kk = 10+2*NO;
+  double* ftmp = new double[ kk ];
 
-  for(int i=0; i<3; i++) f[i]   = js[i];
-  for(int i=0; i<3; i++) f[i+3] = average[i];
-  for(int i=0; i<3; i++) f[i+6] = sigma[i];
+  int idx = 0;
 
-  int r = fappend(f, 9, name);
+  ftmp[idx] = N; idx++;
+  for(int i=0; i<3 ; i++) ftmp[i+idx] = js[i]; idx += 3;
+  idx = 10;
+  for(int i=0; i<NO; i++) ftmp[i+idx] = average[i]; idx += NO;
+  for(int i=0; i<NO; i++) ftmp[i+idx] = sigma[i];   idx += NO;
 
-  delete[] f;
+  int r = fappend(ftmp, kk, name);
+
+  delete[] ftmp;
   return r;
 }
 

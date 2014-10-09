@@ -16,7 +16,7 @@
 //number of variational parameters for which we would like to calculate the gradient (not implemented)
 #define NP 0
 
-#define SMALL 1e-10
+#define SMALL 1e-14
 
 struct baseparameters
 {

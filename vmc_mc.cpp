@@ -11,6 +11,11 @@
 
 #include "vmc.h"
 
+/* !!!!!!!!!
+ * THIS CODE IS DEPRICATED AND UNUSED! I keep it here just as a reminder...
+ * !!!!!!!!!
+ */
+
 /* In this file, we define code related to Monte Carlo walking in the space of Ising states */ 
 
 void vmc::randomize()
@@ -123,8 +128,8 @@ void vmc::set_conf( int **c )
 /* experience shows that the system is equilibrated (wf^2 saturates) after roughly twice systemSize steps*/
 void vmc::thermalize()
 {
-  int nn = 4*LD;
-//  cout << "thermalizing with " << nn << " steps\n";
+  int nn = 4*N;
+  cout << "thermalizing with " << nn << " steps\n";
   for(int i=0; i<nn; i++ )
     walk_one_step();
 }
@@ -186,7 +191,7 @@ void vmc::run_a_walk()
 /* fraction of accepted MC moves */
 double vmc::ar() { return (double)ACCEPTED_MOVES / (double)STEPS_TOTAL; }
 
-//this function is depreciated; we do this now in wavefunction.cpp
+//this function is deprecated; we do this now in wavefunction.cpp
 void vmc::walk_one_step()
 {
   STEPS_TOTAL++;

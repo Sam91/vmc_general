@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-  int req_args = 6;
+  int req_args = 7;
 
   for(int i=0; i<argc; i++) cout << argv[i] << " ";
   cout << "\n";
@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
   if(argc<req_args+1)
   {
     cout << "Error: incorrect number of arguments (" << argc << ")\n";
+    cout << argv[0] << " L cbc j1 j2 j3 mc_len nbin\n";
     exit(-1);
   }
 
@@ -24,6 +25,8 @@ int main(int argc, char *argv[])
   //wf->set_lattice( "checkerboard" );
   //wf->set_lattice( "triangular" );
   wf->set_lattice( "kagome" );
+
+  wf->set_mc_length( atoi(argv[6]) );
 
   int cbc = atoi(argv[2]);
   if( cbc==1 )
@@ -41,7 +44,7 @@ int main(int argc, char *argv[])
   vmc* myvmc = new vmc();
   myvmc->set_wf( wf );
 
-  myvmc->initialize( atoi(argv[6]) ); //number of bins to average over
+  myvmc->initialize( atoi(argv[7]) ); //number of bins to average over
   
   wf->js[0] = atoi(argv[3])/100.; //j1
   wf->js[1] = atoi(argv[4])/100.; //j2
@@ -67,7 +70,8 @@ int main(int argc, char *argv[])
 //    wf->insert_file( argv[3] );
 //  }
 
-  wf->insert_db();
+  //wf->insert_db();
+    wf->insert_file( "he_correlator.out" );
   //fappend(wf->js, 3, "test.out");
 
 
