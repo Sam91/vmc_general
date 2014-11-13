@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
   myvmc->calculate_statistics();
 
   //char* fn = new char[100];
-  string fn = "/users/invites/sbieri/chain_tst.out";
+  string fn = "chain_tst.out";
 
-  wf->insert_db();
-  //wf->insert_file( fn );
+  //wf->insert_db();
+  wf->insert_file( fn );
 
   delete myvmc;
 
