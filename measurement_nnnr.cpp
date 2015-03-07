@@ -14,7 +14,8 @@
     {
       for(int q=0; q<Q; q++)
       {
-        int i1 = alpha->mylattice->j(nx,ny,q);
+        int i1 = q + Q*( nx + L*ny);
+        //int i1 = alpha->mylattice->j(nx,ny,q);
 
         //swap with ratio=true(i.e., only the ratio is calculated but the wf is not updated)
 

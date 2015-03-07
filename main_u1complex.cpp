@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
   myvmc->run();
   myvmc->calculate_statistics();
 
-  wf->insert_db();
-  //wf->insert_file("correlator.out");
+  //wf->insert_db();
+  wf->insert_file("correlator.out");
 
   delete myvmc;
 

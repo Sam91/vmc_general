@@ -221,7 +221,7 @@ void u1hybrid::construct_gs()
       cout << ")\n";
     }
     cout << "Enter " << N-ne0 << " states: ";
-    if( false ) //read in the states to use (choose by hand)
+    if( true ) //read in the states to use (choose by hand)
       for(int i=ne0; i<N; i++) {cin >> occ[i]; occ[i] += ne0;}
 
     else { //simply choose the first states that come

@@ -13,7 +13,7 @@ u1kagome::u1kagome(int l) : u1hybrid( l )
 
   pars->ap = new bool[DIM];
 
-//set the default values
+  //set the default values
   pars->ap[0] = false; pars->ap[1] = false;
 
   pars->e2 = false;
@@ -118,7 +118,7 @@ void u1kagome::set_hoppingk(double mu0)
 #endif
         }
 
-        if( pars->e2 ) // unit cell doubling
+        if( pars->e2 ) // cell doubling for first neighbors
         {
           if( q1==0 && k==2 ) {
               t[n][n][i1][i2] *= -1.; t[n][n][i2][i1] *= -1.;
@@ -167,7 +167,7 @@ void u1kagome::set_hoppingk(double mu0)
 #endif
         }
 
-        if( pars->e2 ) //unit cell doubling
+        if( pars->e2 ) //cell doubling for 2nd neighbors
         {
           if( (n1[1])%2==0 ) {
             if( (q1==0 && k==2) || (q1==1 && k==2) || (q1==2 && k==1) ) {
@@ -193,7 +193,7 @@ void u1kagome::set_hoppingk(double mu0)
       {
         i2 = alpha->mylattice->links[i1][2][k];
 
-        //cout<<"i1="<<i1<<"; i2="<<i2<<"; k="<<k<<endl;
+       // cout<<"i1="<<i1<<"; i2="<<i2<<"; k="<<k<<endl;
 
         alpha->mylattice->getnq(n2, q2, i2); //get the cartesian coordinates for i2
 
@@ -212,7 +212,7 @@ void u1kagome::set_hoppingk(double mu0)
 #endif
         }
 
-        if( pars->e2 ) //unit cell doubling
+        if( pars->e2 ) //cell doubling for 3rd neighbors
         {
           if( (n1[1])%2==1 ) {
             if( q1!=2 ) {
@@ -236,6 +236,18 @@ void u1kagome::set_hoppingk(double mu0)
 
     } //end loop flavors
   } //end loop sites
+
+  cout << "{";
+  for( int i1=0; i1<N; i1++)
+  {
+    cout << "{";
+    for( int i2=0; i2<N; i2++) {
+      complex<double> c = t[0][0][i1][i2];
+      cout << (abs(c)<1e-4 ? 0. : c.imag()) << ", ";
+    }
+    cout << "},\n";
+  }
+  cout << "}\n";
 
   delete[] n1; delete[] n2;
 }
@@ -294,12 +306,14 @@ int u1kagome::insert_db()
 
 int u1kagome::insert_file(string name)
 {
-  int kk = 10+2*NO;
+  int kk = 12+2*NO;
   double* ftmp = new double[ kk ];
 
   int idx = 0;
 
   ftmp[idx] = N; idx++;
+  ftmp[idx] = pars->ap[0]; idx++;
+  ftmp[idx] = pars->ap[1]; idx++;
   ftmp[idx] = pars->e2; idx++;
   ftmp[idx] = pars->TR; idx++;
   ftmp[idx] = pars->gR; idx++;

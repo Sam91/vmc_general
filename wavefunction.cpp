@@ -15,7 +15,7 @@ wavefunction::wavefunction( int l )
   //the number of operators we want to average over
   //this->NO = Q*Q*LD; //here, we save all correlators, but average over lattice translations
 
-  this->NO = N-1; //all correlators on chain
+  NO = N-1; //all correlators on chain
   //NO = Q*N;
   //NO = 3;
   //NO = 15;
@@ -222,6 +222,7 @@ void wavefunction::accumulate()
 #include "measurement_all_chain.cpp"
 //#include "measurement_all_kag.cpp"
 //#include "measurement_nnn.cpp"
+//#include "measurement_nnnr.cpp"
 //#include "measurement_thrd.cpp"
 //#include "measurement_subl.cpp"
 
